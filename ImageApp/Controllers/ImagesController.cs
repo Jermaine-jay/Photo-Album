@@ -15,18 +15,22 @@ namespace ImageApp.Controllers
         {
             _UploadImage = uploadImage;
         }
-        /*public IActionResult Index()
+        public IActionResult Home()
         {
             return View();
-        }*/
+        }
+        public IActionResult Album()
+        {
+            return View();
+        }
 
-        [Authorize(Roles = Roles.User)]
+        /*[Authorize(Roles = Roles.User)]*/
         public IActionResult NewImage()
         {
             return View(new ProductVM());
         }
 
-        [Authorize(Roles = Roles.User)]
+        /*[Authorize(Roles = Roles.User)]*/
         public async Task<IActionResult> AllImages()
         {
             var model = await _UploadImage.GetImages();

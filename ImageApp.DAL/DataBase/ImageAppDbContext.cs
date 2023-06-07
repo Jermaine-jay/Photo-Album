@@ -14,5 +14,7 @@ namespace ImageApp.DAL.DataBase
 
         }
         public DbSet<Pictures> Products { get; set; }
+
+        
     }
 }
