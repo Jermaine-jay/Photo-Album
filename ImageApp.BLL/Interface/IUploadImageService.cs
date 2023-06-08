@@ -5,7 +5,7 @@ namespace ImageApp.BLL.Interface
 {
     public interface IUploadImageService
     {
-        Task<(bool successful, string msg)> AddImage(ProductVM product);
-        Task<IEnumerable<AllProductVM>> GetImages();
+        Task<(bool successful, string msg)> AddImage(AddOrUpdatePictureVM product);
+        Task<IEnumerable<AllPicturesVM>> GetImages();
     }
 }

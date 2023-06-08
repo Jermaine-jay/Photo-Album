@@ -3,16 +3,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ImageApp.BLL.Models
 {
-    public class ProductVM
+    public class AddOrUpdatePictureVM
     {
-        public int Id { get; set; }
+		public string? UserId { get; set; }
+		public string? PictureId { get; set; }
+
         [Required]
         public string Name { get; set; }
         [Required]
         public string Description { get; set; }
+
         [Required]
         [Display(Name = "Image")]
-        //[FileExtensions(Extensions = "jpg,jpeg,png,gif")]
         public IFormFile ImageFile { get; set; }
     }
 }

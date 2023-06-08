@@ -12,19 +12,19 @@ namespace ImageApp.BLL.Implementation
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<Pictures> _productRepo;
+        private readonly IRepository<Picture> _productRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public UploadImageService(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _productRepo = _unitOfWork.GetRepository<Pictures>();
+            _productRepo = _unitOfWork.GetRepository<Picture>();
             _webHostEnvironment = webHostEnvironment;
         }
 
 
-        public async Task<(bool successful, string msg)> AddImage(ProductVM model)
+        public async Task<(bool successful, string msg)> AddImage(AddOrUpdatePictureVM model)
         {
             var fileName = model.ImageFile.FileName;
             var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "img", "portfolio");
@@ -39,24 +39,23 @@ namespace ImageApp.BLL.Implementation
                 await model.ImageFile.CopyToAsync(stream);
             }
 
-            AllProductVM img = new()
+            AllPicturesVM img = new()
             {
                 ImageFile = fileName,
                 Name = model.Name,
                 Description = model.Description,
             };
 
-            var product = _mapper.Map<Pictures>(img);
+            var product = _mapper.Map<Picture>(img);
             var rowChanges = await _productRepo.AddAsync(product);
 
             return rowChanges != null ? (true, "Product created successfully!") : (false, "Failed to create product");
         }
 
-
-        public async Task<IEnumerable<AllProductVM>> GetImages()
+        public async Task<IEnumerable<AllPicturesVM>> GetImages()
         {
             var product = await _productRepo.GetAllAsync();
-            var productViewModels = product.Select(u => new AllProductVM
+            var productViewModels = product.Select(u => new AllPicturesVM
             {
                 Name = u.Name,
                 Description = u.Description,

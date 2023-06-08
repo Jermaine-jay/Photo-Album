@@ -27,7 +27,7 @@ namespace ImageApp.Controllers
         /*[Authorize(Roles = Roles.User)]*/
         public IActionResult NewImage()
         {
-            return View(new ProductVM());
+            return View(new AddOrUpdatePictureVM());
         }
 
         /*[Authorize(Roles = Roles.User)]*/
@@ -38,7 +38,7 @@ namespace ImageApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Save(ProductVM model)
+        public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
         {
             if (ModelState.IsValid)
             {

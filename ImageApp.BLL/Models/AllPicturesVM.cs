@@ -1,8 +1,9 @@
 ﻿namespace ImageApp.BLL.Models
 {
-    public class AllProductVM
+    public class AllPicturesVM
     {
-        public int? Id { get; set; }
+        public string? Id { get; set; }
+        public string UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ImageFile { get; set; }

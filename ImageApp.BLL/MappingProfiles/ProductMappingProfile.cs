@@ -13,9 +13,9 @@ namespace ImageApp.BLL.MappingProfiles
     {
         public ProductMappingProfile()
         {
-            CreateMap<ProductVM, Pictures>();
-            CreateMap<Pictures, ProductVM>();
-            CreateMap<AllProductVM, Pictures>();
+            CreateMap<AddOrUpdatePictureVM, Picture>();
+            CreateMap<Picture, AddOrUpdatePictureVM>();
+            CreateMap<AllPicturesVM, Picture>();
         }
     }
 }

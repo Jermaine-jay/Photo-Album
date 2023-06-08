@@ -13,7 +13,8 @@ namespace ImageApp.Extensions
         {
             services.AddScoped<IUploadImageService, UploadImageService>();
             services.AddScoped<IUserServices, UserServices>();
-            services.AddHttpContextAccessor();
+			services.AddScoped<IPropertyService, PropertyService>();
+			services.AddHttpContextAccessor();
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)

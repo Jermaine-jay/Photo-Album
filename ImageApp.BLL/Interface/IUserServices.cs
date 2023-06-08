@@ -13,5 +13,9 @@ namespace ImageApp.BLL.Interface
         Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register);
         Task<(bool successful, string msg)> SignIn(SignInVM register);
         Task<(bool successful, string msg)> SignOut();
-    }
+        Task<(bool successful, string msg)> Update(RegisterVM model);
+        Task<IEnumerable<PictureVM>> GetUsersWithTasksAsync(string userId);
+        Task<UserVM> GetUser(string? userId);
+
+	}
 }

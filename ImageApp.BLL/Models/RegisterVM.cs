@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ImageApp.DAL.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ImageApp.BLL.Models
 {
@@ -15,7 +16,16 @@ namespace ImageApp.BLL.Models
         [Required, DataType(DataType.Text)]
         public string Address { get; set; }
 
-        [Required, DataType(DataType.PhoneNumber), MaxLength(12)]
+		[Required, DataType(DataType.Text)]
+		public string Gender { get; set; }
+
+		[Required, DataType(DataType.DateTime)]
+		public string DateOfBirth { get; set; }
+
+		[DataType(DataType.Text)]
+		public string Age { get; set; }
+
+		[Required, DataType(DataType.PhoneNumber), MaxLength(12)]
         public string PhoneNumber { get; set; }
 
         [Required, DataType(DataType.Password)]

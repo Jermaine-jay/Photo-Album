@@ -22,8 +22,6 @@ builder.Services.ConfigureIdentity();
 // Add services to the container.
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<ImageAppDbContext>>();
-/*builder.Services.AddScoped<IUploadImageService, UploadImageService>();//todo: show other life-cycles*/
-builder.Services.AddScoped<ICreateImage, CreateImage>();//todo: show other life-cycles
 builder.Services.AddAutoMapper(Assembly.Load("ImageApp.BLL"));
 
 
