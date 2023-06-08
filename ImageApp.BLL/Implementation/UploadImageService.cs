@@ -14,6 +14,7 @@ namespace ImageApp.BLL.Implementation
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Picture> _productRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IPropertyService _propertyService;
 
         public UploadImageService(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
@@ -46,11 +47,9 @@ namespace ImageApp.BLL.Implementation
                 Description = model.Description,
             };
 
-            var product = _mapper.Map<Picture>(img);
-            var rowChanges = await _productRepo.AddAsync(product);
-
-            return rowChanges != null ? (true, "Product created successfully!") : (false, "Failed to create product");
-        }
+			var result = await _propertyService?.AddOrUpdateAsync(model.UserId, model.PictureId, img);
+            return result;
+		}
 
         public async Task<IEnumerable<AllPicturesVM>> GetImages()
         {
