@@ -24,16 +24,26 @@ namespace ImageApp.Controllers
             return View();
         }
         
-        public IActionResult RegisterUser()
+        public IActionResult RegisterUser(string? Id)
         {
-            return View(new RegisterVM());
+            var user = _userServices.GetUser(Id);
+            if(Id == null)
+            {
+                return View(new RegisterVM());
+            }
+            return View(user);
         }
         
 
-        public IActionResult RegisterAdmin()
+        public IActionResult RegisterAdmin(string? Id)
         {
-            return View(new RegisterVM());
-        }
+			var user = _userServices.GetUser(Id);
+			if (Id == null)
+			{
+				return View(new RegisterVM());
+			}
+			return View(user);
+		}
 
         
         public IActionResult SignIn()
@@ -77,7 +87,24 @@ namespace ImageApp.Controllers
             return View("Index", "Home");
         }
 
-        [HttpPost]
+		[HttpPost]
+        public async Task<IActionResult> SaveUpdate(RegisterVM model)
+		{
+			if (ModelState.IsValid)
+			{
+				var (successful, msg) = await _userServices.Update(model);
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("Index", "Home");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("Index", "Home");
+			}
+			return View("Index", "Home");
+		}
+
+		[HttpPost]
         public async Task<IActionResult> SignIn(SignInVM model)
         {
             if (ModelState.IsValid)
@@ -88,9 +115,7 @@ namespace ImageApp.Controllers
 
                     TempData["SuccessMsg"] = msg;
                     return RedirectToAction("Index", "Home");
-                }
-
-                
+                }        
                 TempData["ErrMsg"] = msg;
                 return View("SignIn");
             }

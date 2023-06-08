@@ -33,25 +33,25 @@
 				<label asp-for="@Model.Username" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Username" required />
 				<span asp-validation-for="@Model.Username"></span>
-				<i class="fas fa-user"></i>
+				<i class="fas fa-user p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.Email" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Email" required />
 				<span asp-validation-for="@Model.Email"></span>
-				<i class="fas fa-envelope"></i>
+				<i class="fas fa-envelope p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.PhoneNumber" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.PhoneNumber" required />
 				<span asp-validation-for="@Model.PhoneNumber"></span>
-				<i class="fas fa-phone"></i>
+				<i class="fas fa-phone p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.Address" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Address" required />
 				<span asp-validation-for="@Model.Address"></span>
-				<i class="fas fa-address-card"></i>
+				<i class="fas fa-address-card p-2"></i>
 			</div>
 
 			<div class="form-row">
@@ -64,7 +64,7 @@
 			<div class="form-row">
 				<label asp-for="@Model.Gender" class="form-label"></label>
 				<select class="form-select" aria-label="Default select example" asp-for="@Model.Gender" asp-items="Html.GetEnumSelectList <Gender>()">
-					<option selected="" value="">Gender</option>
+					<option selected="" value=""></option>
 				</select>
 			</div>
 
@@ -72,14 +72,14 @@
 				<label asp-for="@Model.Password" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Password" required />
 				<span asp-validation-for="@Model.Password"></span>
-				<i class="fas fa-lock"></i>
+				<i class="fas fa-lock p-2"></i>
 			</div>
 
 			<div class="form-row">
 				<label asp-for="@Model.ConfirmPassword" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.ConfirmPassword" required />
 				<span asp-validation-for="@Model.ConfirmPassword"></span>
-				<i class="fas fa-lock"></i>
+				<i class="fas fa-lock p-2"></i>
 			</div>
 
 			

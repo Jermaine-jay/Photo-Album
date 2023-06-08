@@ -3,8 +3,10 @@ using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Security.Cryptography;
 
 namespace ImageApp.BLL.Implementation
@@ -15,17 +17,18 @@ namespace ImageApp.BLL.Implementation
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IRepository<Picture> _pictureRepo;
 		private readonly IRepository<User> _userRepo;
+		private readonly IWebHostEnvironment _webHostEnvironment;
 
-		public PropertyService(IUnitOfWork unitOfWork, IMapper mapper)
+		public PropertyService(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
 		{
 			_mapper = mapper;
 			_unitOfWork = unitOfWork;
 			_pictureRepo = _unitOfWork.GetRepository<Picture>();
+			_webHostEnvironment = webHostEnvironment;
 		}
 
 		public async Task<(bool successful, string msg)> AddOrUpdateAsync(string userId, string pictureId, AllPicturesVM allPicturesVM)
 		{
-
 			User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
 			if (user == null)
 			{
@@ -55,12 +58,21 @@ namespace ImageApp.BLL.Implementation
 				return (false, $"User with ID{user.Id} not found");
 			}
 
-			var picture = user?.Pictures?.SingleOrDefault(u => u.Id == productId);
+			Picture? picture = user?.Pictures?.SingleOrDefault(u => u.Id == productId);
 			if (picture != null)
 			{
 				await _pictureRepo.DeleteAsync(picture);
 				return (true, $"task with taskId{productId} Deleted");
 			}
+
+			var fileName = picture.ImageFile;
+			var filePathToDelete = Path.Combine(_webHostEnvironment.WebRootPath, "img", "portfolio",fileName);
+			if (picture == null || File.Exists(filePathToDelete))
+			{
+				return (false, $"Aunction with user:{picture.Id} wasn't found");
+			}
+
+			File.Delete(filePathToDelete);
 			return (false, $"Task with id:{productId} was not found");
 		}
 
@@ -87,6 +99,5 @@ namespace ImageApp.BLL.Implementation
 		}
 
 		
-
 	}
 }
