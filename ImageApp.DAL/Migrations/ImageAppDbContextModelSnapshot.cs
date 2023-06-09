@@ -125,7 +125,6 @@ namespace ImageApp.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
@@ -361,8 +360,7 @@ namespace ImageApp.DAL.Migrations
                 {
                     b.Navigation("Pictures");
 
-                    b.Navigation("ProfilePicture")
-                        .IsRequired();
+                    b.Navigation("ProfilePicture");
                 });
 #pragma warning restore 612, 618
         }

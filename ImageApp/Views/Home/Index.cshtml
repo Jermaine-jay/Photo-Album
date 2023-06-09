@@ -111,7 +111,10 @@
     @{
     var currentUser = User.Identity.Name;
 }
-
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Welcome, @currentUser!</p>
+    <p>Other content for authenticated users...</p>
 @if (User.IsInRole("User"))
 {
     <p>Welcome, @currentUser!</p>
@@ -120,5 +123,6 @@
 else
 {
     <p>Not logged in</p>
+}
 }
 

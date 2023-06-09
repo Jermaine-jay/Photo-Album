@@ -5,6 +5,7 @@ using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -14,48 +15,38 @@ namespace ImageApp.BLL.Implementation
 		private readonly SignInManager<User> _signInManager;
 		private readonly IMapper _mapper;
 		private readonly IRepository<User> _userRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
-		private RoleManager<IdentityRole> _roleManager { get; }
+        private RoleManager<IdentityRole> _roleManager { get; }
 
-		public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper)
+		public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_roleManager = roleManager;
+			_unitOfWork = unitOfWork;
+			_userRepo = _unitOfWork?.GetRepository<User>();
 			_mapper = mapper;
 		}
 
-		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
+        public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
 		{
-			string[] dateComponents = register.DateOfBirth.Split('/');
+            var newUser = CreateAUser(register);
+            IdentityResult result = await _userManager.CreateAsync(newUser.Result, register.Password);
 
-			int year = int.Parse(dateComponents[2]);
-			int age = DateTime.Now.Year - year;
-			register.Age = age.ToString();
-
-			var newUser = _mapper.Map<User>(register);
-			IdentityResult result = await _userManager.CreateAsync(newUser, register.Password);
-
-			await _userManager.AddToRoleAsync(newUser, "Admin");
-			await _signInManager.SignInAsync(newUser, isPersistent: false);
+			await _userManager.AddToRoleAsync(newUser.Result, "Admin");
+			await _signInManager.SignInAsync(newUser.Result, isPersistent: false);
 
 			return result.Succeeded ? (true, "Admin created successfully!") : (false, "Failed to create Admin");
 		}
 
 		public async Task<(bool successful, string msg)> RegisterUser(RegisterVM register)
 		{
-			string[] dateComponents = register.DateOfBirth.Split('/');
+			var newUser = CreateAUser(register);
+            IdentityResult result = await _userManager.CreateAsync(newUser.Result, register.Password);
 
-			int year = int.Parse(dateComponents[2]);
-			int age = DateTime.Now.Year - year;
-			register.Age = age.ToString();
-
-			var newUser = _mapper.Map<User>(register);
-			IdentityResult result = await _userManager.CreateAsync(newUser, register.Password);
-
-			await _userManager.AddToRoleAsync(newUser, "User");
-
-			await _signInManager.SignInAsync(newUser, isPersistent: false);
+            await _userManager.AddToRoleAsync(newUser.Result, "User");
+			await _signInManager.SignInAsync(newUser.Result, isPersistent: false);
 
 			return result.Succeeded ? (true, "User created successfully!") : (false, "Failed to create User");
 		}
@@ -122,5 +113,27 @@ namespace ImageApp.BLL.Implementation
 			});
 			return UwT;
 		}
+
+		public  async Task<User> CreateAUser(RegisterVM register)
+		{
+            string[] dateComponents = register.DateOfBirth.Split('-');
+            int year = int.Parse(dateComponents[0]);
+            int age = DateTime.Now.Year - year;
+
+            UserVM userVM = new UserVM()
+            {
+                UserName = register.Username,
+                Email = register.Email,
+                PhoneNumber = register.PhoneNumber,
+                Address = register.Address,
+                Gender = register.Gender,
+                DateOfBirth = register.DateOfBirth,
+                Age = age.ToString(),
+
+            };
+            var newUser = _mapper.Map<User>(userVM);
+            
+			return newUser;
+        }
 	}
 }

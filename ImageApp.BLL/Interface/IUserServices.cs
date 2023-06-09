@@ -1,4 +1,5 @@
 ﻿using ImageApp.BLL.Models;
+using ImageApp.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace ImageApp.BLL.Interface
         Task<(bool successful, string msg)> Update(RegisterVM model);
         Task<IEnumerable<PictureVM>> GetUsersWithTasksAsync(string userId);
         Task<UserVM> GetUser(string? userId);
+        Task<User> CreateAUser(RegisterVM register);
 
-	}
+
+    }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ImageApp.DAL.Migrations
 {
     [DbContext(typeof(ImageAppDbContext))]
-    [Migration("20230608100105_InitialMigration")]
+    [Migration("20230608154601_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -127,7 +127,6 @@ namespace ImageApp.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
@@ -363,8 +362,7 @@ namespace ImageApp.DAL.Migrations
                 {
                     b.Navigation("Pictures");
 
-                    b.Navigation("ProfilePicture")
-                        .IsRequired();
+                    b.Navigation("ProfilePicture");
                 });
 #pragma warning restore 612, 618
         }
