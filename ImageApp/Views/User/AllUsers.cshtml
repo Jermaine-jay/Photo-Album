@@ -1,5 +1,88 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+@model IEnumerable<ImageApp.BLL.Models.UserVM>
+
+<div class="container">
+
+    <section class="breadcrumbs">
+        <div class="container">
+        </div>
+    </section>
+
+    @if (@TempData["SuccessMsg"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> @TempData["SuccessMsg"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
+    @if (@TempData["ErrMsg"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> @TempData["ErrMsg"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Age</th>
+                <th scope="col">Date Of Birth</th>
+                <th scope="col">Address</th>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model.Select((value, i) => new { value, i }))
+        {
+            <tbody>
+
+                <tr>
+                    <th scope="row">@(item.i + 1)</th>
+                    <td>@item.value.UserName</td>
+                    <td>@item.value.Email</td>
+                    <td>@item.value.PhoneNumber</td>
+                    <td>@item.value.Gender</td>
+                    <td>@item.value.Age</td>
+                    <td>@item.value.DateOfBirth</td>
+                    <td>@item.value.Address</td>
+
+                    <td class="d-flex">
+
+                        <span class="px-1">
+                            <form action="@Url.Action("UpdateUser", "User", new { userId = @item.value.Id})" method="Get">
+                                <input type="submit" class="btn btn-secondary btn-sm" value="Edit" placeholder="@item.value.Id" />
+                            </form>
+                        </span>
+
+                        <span class="px-1">
+                            <form action="@Url.Action("Delete", "User", new { userId = @item.value.Id})" method="post">
+                                <input type="submit" class="btn btn-danger btn-sm" value="Delete" placeholder="@item.value.Id" />
+                            </form>
+                        </span>
+                    </td>
+                </tr>
+
+            </tbody>
+        }
+    </table>
+
+</div>
+
+@section Scripts
+    {
+    @{
+        Html.RenderPartial("_ValidationScriptsPartial");
+    }
 }

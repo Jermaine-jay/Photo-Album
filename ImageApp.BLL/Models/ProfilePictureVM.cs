@@ -9,8 +9,8 @@ namespace ImageApp.BLL.Models
 {
 	public class ProfilePictureVM
 	{
-		public string ProfilePictureId { get; set; }
-		public string UserId { get; set; }
+		public int? Id { get; set; }
+		public string? UserId { get; set; }
 		public IFormFile? ProfileImagePath { get; set; }
 	}
 }

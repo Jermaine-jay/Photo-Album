@@ -1,4 +1,5 @@
-﻿using ImageApp.BLL.Interface;
+﻿using ImageApp.BLL.Implementation;
+using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -25,48 +26,46 @@ namespace ImageApp.Controllers
 		{
 			return View();
 		}
-		public async Task<IActionResult> Profile()
-		{
-			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var user = await _userServices.GetUser(userId);
-			if (user == null)
-			{
-				return View(new RegisterVM());
 
-			}
-			return View(user);
-		}
+        public IActionResult RegisterUser()
+        {
+            return View(new RegisterVM());
+        }
 
-		public IActionResult RegisterUser()
-		{
+        public IActionResult RegisterAdmin()
+        {
+            return View(new RegisterVM());
+        }
 
-			return View(new RegisterVM());
+        public async Task<IActionResult> Profile()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userServices.UserProfileAsync(userId);
+            if (user == null)
+            {
+                return View(new UserVM());
+            }
+            return View(user);
+        }
 
-		}
+        public async Task<IActionResult> AllUsers()
+        {
+            var model = await _userServices.GetUsers();
+            return View(model);
+        }
 
-		public IActionResult RegisterAdmin()
-		{
-
-			return View(new RegisterVM());
-
-		}
-
-		public async Task<IActionResult> UpdateUser()
+        public async Task<IActionResult> UpdateUser()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var user = await _userServices.GetUser(userId);
 			if(user == null)
 			{
 				return View(new RegisterVM());
-
 			}
 			
 			/*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
 			return View(user);
-
-
 		}
-
 
 		public IActionResult SignIn()
 		{
@@ -81,7 +80,6 @@ namespace ImageApp.Controllers
 				var (successful, msg) = await _userServices.RegisterUser(model);
 				if (successful)
 				{
-
 					TempData["SuccessMsg"] = msg;
 					return RedirectToAction("SignIn");
 				}
@@ -108,8 +106,8 @@ namespace ImageApp.Controllers
 			return View("RegisterAdmin");
 		}
 
-		[HttpPut]
-		public async Task<IActionResult> SaveUpdate(RegisterVM model)
+		[HttpPost]
+		public async Task<IActionResult> SaveUpdate(UserVM model)
 		{
 			if (ModelState.IsValid)
 			{
@@ -120,9 +118,9 @@ namespace ImageApp.Controllers
 					return RedirectToAction("Profile");
 				}
 				TempData["ErrMsg"] = msg;
-				return View("Profile");
+				return View("UpdateUser");
 			}
-			return View("Profile");
+			return View("UpdateUser");
 		}
 
 		[HttpPost]
@@ -158,5 +156,22 @@ namespace ImageApp.Controllers
 			}
 			return View("Index", "Home");
 		}
-	}
+
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            if (ModelState.IsValid)
+            {
+                var (successful, msg) = await _userServices.DeleteAsync(userId);
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("AllUsers");
+                }
+                TempData["ErrMsg"] = msg;
+                return View("AllUsers");
+            }
+            return View("AllUsers");
+        }
+
+    }
 }

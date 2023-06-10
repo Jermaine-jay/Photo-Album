@@ -1,6 +1,9 @@
-﻿
-@model IEnumerable<ImageApp.BLL.Models.AllPicturesVM>
+﻿@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
 
+@model IEnumerable<ImageApp.BLL.Models.AllPicturesVM>
 
 @if (@TempData["SuccessMsg"] != null)
 {
@@ -27,28 +30,43 @@
 
 <div>
 
-    <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-">
-        <img src="~/aunction3.jpg" class="img-rounded" alt="hey">     
-    </div>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">ImageFile</th>
+                
+            </tr>
+        </thead>
 
-</div>
+        @foreach (var item in Model.Select((value, i) => new { value, i }))
+        {
+            <tbody>
 
-    @foreach (var item in Model.Select((value, i) => new { value, i }))
-    {
+                <tr>
+                    <th scope="row">@(item.i + 1)</th>
+                    <td>@item.value.Name</td>
+                    <td>@item.value.ImageFile</td>
+                    <td class="d-flex">
 
-        <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="px-1">
+                            <form action="@Url.Action("UpdateUser", "User", new { userId = @item.value.Id})" method="Get">
+                                <input type="submit" class="btn btn-secondary btn-sm" value="Edit" placeholder="@item.value.Id" />
+                            </form>
+                        </span>
 
-                <span>@item.value.Id</span>
-            <img src="~/img/portfolio/@item.value.ImageFile" class="img-rounded" alt="hey">
-            <div>
-                <span>@item.value.Name</span>
-                <span>@item.value.Description</span>
-            </div>
-            </li>
+                        <span class="px-1">
+                            <form action="@Url.Action("Delete", "User", new { userId = @item.value.Id})" method="post">
+                                <input type="submit" class="btn btn-danger btn-sm" value="Delete" placeholder="@item.value.Id" />
+                            </form>
+                        </span>
+                    </td>
+                </tr>
 
-        </ul>
-    }
+            </tbody>
+        }
+    </table>
 
 @section Scripts
     {

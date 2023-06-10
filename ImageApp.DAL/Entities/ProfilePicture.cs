@@ -10,11 +10,8 @@ namespace ImageApp.DAL.Entities
 {
     public class ProfilePicture
     {
-        [Key]
-        public string? Id { get; set; }
-        public string? ProfileImagePath { get; set; } = "Blank Pfp.jpeg";
-
-		[ForeignKey("User")]
+        public int Id { get; set; }
+        public string ProfileImagePath { get; set; } = "Blank-Pfp.jpg";
 		public string UserId { get; set; }
         public User User { get; set; }
     }
