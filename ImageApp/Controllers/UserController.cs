@@ -157,6 +157,7 @@ namespace ImageApp.Controllers
 			return View("Index", "Home");
 		}
 
+		[HttpPost]
         public async Task<IActionResult> DeleteUser(string userId)
         {
             if (ModelState.IsValid)

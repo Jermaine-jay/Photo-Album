@@ -21,10 +21,11 @@ namespace ImageApp.BLL.Implementation
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _pictureRepo = _unitOfWork.GetRepository<Picture>();
+            _userRepo = _unitOfWork.GetRepository<User>();
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<(bool successful, string msg)> AddOrUpdateAsync(string userId, int pictureId, AllPicturesVM allPicturesVM)
+        public async Task<(bool successful, string msg)> AddOrUpdateAsync(string userId, string pictureId, AllPicturesVM allPicturesVM)
         {
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
             if (user == null)
@@ -47,7 +48,7 @@ namespace ImageApp.BLL.Implementation
             return rowChanges != null ? (true, $"Picture uccessfully created!") : (false, "Failed To Create picture!");
         }
 
-        public async Task<(bool successful, string msg)> DeletePictureAsync(string userId, int productId)
+        public async Task<(bool successful, string msg)> DeletePictureAsync(string userId, string pictureId)
         {
             User user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
             if (user == null)
@@ -55,11 +56,11 @@ namespace ImageApp.BLL.Implementation
                 return (false, $"User with ID{user?.Id} not found");
             }
 
-            Picture? picture = user?.Pictures?.SingleOrDefault(u => u.Id == productId);
+            Picture? picture = user?.Pictures?.SingleOrDefault(u => u.Id == pictureId);
             if (picture != null)
             {
                 await _pictureRepo.DeleteAsync(picture);
-                return (true, $"task with taskId{productId} Deleted");
+                return (true, $"task with taskId{pictureId} Deleted");
             }
 
             string? fileName = picture?.ImageFile;
@@ -70,10 +71,10 @@ namespace ImageApp.BLL.Implementation
             }
 
             File.Delete(filePathToDelete);
-            return (false, $"Task with id:{productId} was not found");
+            return (false, $"Task with id:{pictureId} was not found");
         }
 
-        public async Task<PictureVM> GetPicture(string userId, int pictureId)
+        public async Task<PictureVM> GetPicture(string userId, string pictureId)
         {
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
             if (!string.IsNullOrEmpty(user.ToString()))
@@ -87,14 +88,27 @@ namespace ImageApp.BLL.Implementation
                         Name = picture.Name,
                         ImageFile = picture.ImageFile,
                         Description = picture.Description,
+                        UserId = userId,
                     };
-                    var userTask = _mapper.Map<PictureVM>(UaP);
-                    return userTask;
+                    //var userTask = _mapper.Map<PictureVM>(UaP);
+                    return UaP;
                 }
             }
             return null;
         }
 
-
+        public async Task<IEnumerable<PictureVM>> GetUserWithPicturesAsync(string userId)
+        {
+            User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
+            var UwT = user?.Pictures?.Select(t => new PictureVM
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                ImageFile = t.ImageFile,
+                UserId = t.UserId
+            });
+            return UwT;
+        }
     }
 }

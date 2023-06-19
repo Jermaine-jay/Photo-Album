@@ -1,5 +1,3 @@
-using ImageApp.BLL.Implementation;
-using ImageApp.BLL.Interface;
 using ImageApp.DAL.DataBase;
 using ImageApp.DAL.Repository;
 using ImageApp.Extensions;
@@ -10,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ImageAppDbContext>(opts =>
 {
-
     var defaultConn = builder.Configuration.GetSection("ConnectionString")["DefaultConn"];
     opts.UseSqlServer(defaultConn);
 });
@@ -51,10 +48,13 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     ServiceExtensions.Configure(services);
 }
+
+await Seeds.EnsurePopulatedAsync(app);
 
 app.Run();

@@ -14,6 +14,7 @@ namespace ImageApp.Extensions
             services.AddScoped<IUploadImageService, UploadImageService>();
             services.AddScoped<IUserServices, UserServices>();
 			services.AddScoped<IPropertyService, PropertyService>();
+			services.AddScoped<IAuthenticationService, AuthenticationService>();
 			services.AddHttpContextAccessor();
         }
 
@@ -32,7 +33,7 @@ namespace ImageApp.Extensions
                 opt.Password.RequireUppercase = false;
                 opt.User.RequireUniqueEmail = true;
                 opt.Lockout.MaxFailedAccessAttempts = 3;
-                opt.Lockout.DefaultLockoutTimeSpan = System.TimeSpan.FromMinutes(10);
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             });
                 services.AddHttpContextAccessor();
                 services.ConfigureApplicationCookie(options =>
@@ -55,17 +56,17 @@ namespace ImageApp.Extensions
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Check if the roles exist
+            
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
-                // Create Admin role
+              
                 var role = new IdentityRole("Admin");
                 await roleManager.CreateAsync(role);
             }
 
             if (!await roleManager.RoleExistsAsync("User"))
             {
-                // Create User role
+               
                 var role = new IdentityRole("User");
                 await roleManager.CreateAsync(role);
             }

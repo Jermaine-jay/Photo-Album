@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+@model ImageApp.BLL.Models.PictureVM;
+
+<main id="main">
+    
+    <section class="breadcrumbs">
+        <div class="container">
+        </div>
+    </section>
+    <section id="portfolio-details" class="portfolio-details">
+        <div class="container">
+
+            <div class="row gy-4">
+
+                <div class="col-lg-8">
+                    <div class="portfolio-details-slider swiper">
+                        <div class="swiper-wrapper align-items-center">
+
+                            <div class="swiper-slide">
+                                <img src="~/img/portfolio/@Model.ImageFile" alt="">
+                            </div>
+
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="portfolio-info">
+                        <h3>@Model.Name</h3>
+                       <hr />
+                    </div>
+                    <div class="portfolio-description">
+                        <h2>Description</h2>
+                        <p>
+                            @Model.Description
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</main>
+@section Scripts
+    {
+    @{
+        Html.RenderPartial("_ValidationScriptsPartial");
+    }
+ }

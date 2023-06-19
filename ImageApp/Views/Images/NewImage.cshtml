@@ -6,7 +6,7 @@
 @model ImageApp.BLL.Models.AddOrUpdatePictureVM;
 
 
-<form class="col-7" asp-controller="Images" asp-action="Save" enctype="multipart/form-data">
+<form class="col-7" asp-controller="Images" asp-action="Save">
 
     @if (@ViewBag.ErrMsg != null)
     {
@@ -17,6 +17,18 @@
     }
 
     <div class="alert-danger" asp-validation-summary="@ValidationSummary.All"></div>
+
+    <div class="mb-3">
+        <label asp-for="@Model.UserId" class="form-label"></label>
+        <input class="form-control" asp-for="@Model.UserId">
+        <span asp-validation-for="@Model.UserId" class="alert-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="@Model.PictureId" class="form-label"></label>
+        <input class="form-control" asp-for="@Model.PictureId">
+        <span asp-validation-for="@Model.PictureId" class="alert-danger"></span>
+    </div>
 
     <div class="mb-3">
         <label asp-for="@Model.Name" class="form-label"></label>

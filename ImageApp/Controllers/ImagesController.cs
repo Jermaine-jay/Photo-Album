@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace ImageApp.Controllers
 {
 	//[AutoValidateAntiforgeryToken]
-	[Route("[controller]/[action]/{id?}")]
+	[Route("[controller]/[action]/{pictureid?}")]
 	public class ImagesController : Controller
 	{
 		private readonly IUploadImageService _UploadImage;
@@ -22,19 +22,30 @@ namespace ImageApp.Controllers
 		{
 			return View();
 		}
-		public IActionResult Album()
+		public async Task<IActionResult> Album()
 		{
-			return View();
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var model = await _propertyService.GetUserWithPicturesAsync(userId);
+            return View(model);
 		}
 
 		/*[Authorize(Roles = Roles.User)]*/
 		public IActionResult NewImage()
 		{
+
 			return View(new AddOrUpdatePictureVM());
 		}
 
-		/*[Authorize(Roles = Roles.User)]*/
-		public async Task<IActionResult> AllImages()
+		[HttpGet("{userId?}")]
+        public async Task<IActionResult> GetPicture(string pictureId, string userId)
+        {
+            //var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var model = await _propertyService.GetPicture(userId, pictureId);
+            return View(model);
+        }
+
+        /*[Authorize(Roles = Roles.User)]*/
+        public async Task<IActionResult> AllImages()
 		{
 			var model = await _UploadImage.GetImages();
 			return View(model);
@@ -59,14 +70,13 @@ namespace ImageApp.Controllers
 			return View("NewImage");
 		}
 
-
-		[HttpGet("{productId}")]
-        public async Task<IActionResult> DeleteImage(int productId)
+		[HttpPost]
+        public async Task<IActionResult> DeleteImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
             {
-                var (successful, msg) = await _propertyService.DeletePictureAsync(userId, productId);
+                var (successful, msg) = await _propertyService.DeletePictureAsync(userId, pictureId);
 
                 if (successful)
                 {

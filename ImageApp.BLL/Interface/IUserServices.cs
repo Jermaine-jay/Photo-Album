@@ -11,10 +11,8 @@ namespace ImageApp.BLL.Interface
         Task<(bool successful, string msg)> SignOut();
         Task<(bool successful, string msg)> Update(UserVM model);
         Task<(bool successful, string msg)> DeleteAsync(string userId);
-        Task<IEnumerable<PictureVM>> GetUserWithPicturesAsync(string userId);
-        Task<UserWithPicturesVM> UserProfileAsync(string? userId);
+        Task<UserVM> UserProfileAsync(string? userId);
         Task<UserVM> GetUser(string? userId);
-        Task<User> CreateAUser(RegisterVM register);
         Task<IEnumerable<UserVM>> GetUsers();
 
     }
