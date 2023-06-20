@@ -136,7 +136,7 @@ namespace ImageApp.BLL.Implementation
                 Gender = Enum.Parse<Gender>(register.Gender),
                 DateOfBirth = DateTime.Parse(register.DateOfBirth),
                 Age = age.ToString()
-            }; ;
+            };
             return newUser;
         }
 
