@@ -15,7 +15,7 @@ namespace ImageApp.BLL.Models
         public string Email { get; set; }
 
         public string Address { get; set; }
-        public string? Age { get; set; }
+        //public string? Age { get; set; }
 
 		public string Gender { get; set; }
 

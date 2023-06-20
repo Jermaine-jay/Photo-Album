@@ -5,7 +5,7 @@ using ImageApp.DAL.Entities;
 using ImageApp.DAL.Enums;
 using ImageApp.DAL.Repository;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -16,10 +16,11 @@ namespace ImageApp.BLL.Implementation
         private readonly IMapper _mapper;
         private readonly IRepository<User> _userRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthenticationService _authenticationService;
 
         private RoleManager<IdentityRole> _roleManager { get; }
 
-        public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork)
+        public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -27,11 +28,16 @@ namespace ImageApp.BLL.Implementation
             _unitOfWork = unitOfWork;
             _userRepo = _unitOfWork?.GetRepository<User>();
             _mapper = mapper;
+            _authenticationService = authenticationService;
         }
 
         public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
         {
             var newUser = await CreateAUser(register);
+            if (newUser == null)
+            {
+                return (false, "Invalid Email Address");
+            }
             IdentityResult result = await _userManager.CreateAsync(newUser, register.Password);
 
             await _userManager.AddToRoleAsync(newUser, "Admin");
@@ -42,7 +48,11 @@ namespace ImageApp.BLL.Implementation
 
         public async Task<(bool successful, string msg)> RegisterUser(RegisterVM register)
         {
-            var newUser =  await CreateAUser(register);     
+            var newUser = await CreateAUser(register);
+            if (newUser == null)
+            {
+                return (false, "Invalid Email Address");
+            }
             IdentityResult result = await _userManager.CreateAsync(newUser, register.Password);
 
             await _userManager.AddToRoleAsync(newUser, "User");
@@ -66,7 +76,6 @@ namespace ImageApp.BLL.Implementation
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, signIn.Password, signIn.RememberMe, true);
-
                 return result.Succeeded ? (true, $"{user.UserName} logged in successfully!") : (false, "Failed to login");
             }
             return (false, "User does not exist");
@@ -82,16 +91,16 @@ namespace ImageApp.BLL.Implementation
         {
 
             var user = await _userRepo.GetSingleByAsync(u => u.Id == model.Id);
-            if (user == null)
+            var verify = await _authenticationService.VerifyEmail(model.Email);
+            if (verify == false)
             {
-                return (false, $"User with ID:{model.Id} wasn't found");
+                return (false, $"Invalid Email Address");
             }
 
             var userupdate = _mapper.Map(model, user);
             var rowChanges = await _userRepo.UpdateAsync(userupdate);
 
             return rowChanges != null ? (true, $"User detail update was successful!") : (false, "Failed To save changes!");
-
         }
 
         public async Task<(bool successful, string msg)> DeleteAsync(string userId)
@@ -111,6 +120,12 @@ namespace ImageApp.BLL.Implementation
             string[] dateComponents = register.DateOfBirth.Split('-');
             int year = int.Parse(dateComponents[0]);
             int age = DateTime.Now.Year - year;
+            var verify = await _authenticationService.VerifyEmail(register.Email);
+
+            if (verify == false)
+            {
+                return null;
+            }
 
             User newUser = new User
             {
@@ -125,10 +140,10 @@ namespace ImageApp.BLL.Implementation
             return newUser;
         }
 
-        public async Task<UserVM> UserProfileAsync(string? userId)
+        public async Task<ProfileVM> UserProfileAsync(string? userId)
         {
             var u = await _userRepo.GetSingleByAsync(u => u.Id == userId);
-            var useres = new UserVM()
+            var useres = new ProfileVM()
             {
                 Id = u.Id,
                 UserName = u.UserName,
@@ -144,17 +159,17 @@ namespace ImageApp.BLL.Implementation
             return useres;
         }
 
-        public async Task<UserVM> GetUser(string? userId)
+        public async Task<ProfileVM> GetUser(string? userId)
         {
             var user = await _userRepo.GetSingleByAsync(u => u.Id == userId);
-            var Auser = _mapper.Map<UserVM>(user);
+            var Auser = _mapper.Map<ProfileVM>(user);
             return Auser;
         }
 
-        public async Task<IEnumerable<UserVM>> GetUsers()
+        public async Task<IEnumerable<ProfileVM>> GetUsers()
         {
             var users = await _userRepo.GetAllAsync();
-            var userViewModels = users.Select(u => new UserVM
+            var userViewModels = users.Select(u => new ProfileVM
             {
                 Id = u.Id,
                 UserName = u.UserName,

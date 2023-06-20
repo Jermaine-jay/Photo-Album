@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ImageApp.DAL.Migrations
 {
     [DbContext(typeof(ImageAppDbContext))]
-    [Migration("20230614013233_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20230619221951_NewMigration")]
+    partial class NewMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,15 +30,19 @@ namespace ImageApp.DAL.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageFile")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -268,7 +272,9 @@ namespace ImageApp.DAL.Migrations
                 {
                     b.HasOne("ImageApp.DAL.Entities.User", "User")
                         .WithMany("Pictures")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

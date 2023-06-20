@@ -43,7 +43,7 @@ namespace ImageApp.Controllers
             var user = await _userServices.UserProfileAsync(userId);
             if (user == null)
             {
-                return View(new UserVM());
+                return View(new ProfileVM());
             }
             return View(user);
         }
@@ -58,10 +58,6 @@ namespace ImageApp.Controllers
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var user = await _userServices.GetUser(userId);
-			if(user == null)
-			{
-				return View(new RegisterVM());
-			}
 			
 			/*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
 			return View(user);

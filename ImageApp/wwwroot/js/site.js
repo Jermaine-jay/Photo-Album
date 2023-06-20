@@ -1,4 +1,5 @@
-﻿// Event handler for keyup event
+﻿
+// Event handler for keyup event
 /*const handleKeyUp = (event) => {
     const email = event.target.value;
     checkEmailExistence(email);

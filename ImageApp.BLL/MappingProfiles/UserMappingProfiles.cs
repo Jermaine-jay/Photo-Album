@@ -14,7 +14,10 @@ namespace ImageApp.BLL.MappingProfiles
             CreateMap<RegisterVM, User>();
             CreateMap<User, RegisterVM>();
 
-            //CreateMap<UserWithPicturesVM, User>();
+            CreateMap<ProfileVM, User>();
+            CreateMap<User, ProfileVM>();
+
+            CreateMap<UserWithPicturesVM, User>();
             CreateMap<User, UserWithPicturesVM>().ReverseMap();
         }
     }

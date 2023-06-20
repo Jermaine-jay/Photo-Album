@@ -1,11 +1,6 @@
 ﻿using ImageApp.BLL.Interface;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -18,13 +13,13 @@ namespace ImageApp.BLL.Implementation
 		private string? _Url;
 
 		public AuthenticationService(IConfiguration configuration)
-        {
+		{
 			_configuration = configuration;
 			_ApiKey = _configuration.GetSection("ZeroBook")?.GetSection("ApiKey")?.Value;
 			_Url = _configuration.GetSection("ZeroBook")?.GetSection("Url")?.Value;
 			_httpClient = new HttpClient();
 		}
-        public Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
+		public Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
 		{
 			throw new NotImplementedException();
 		}
@@ -43,25 +38,26 @@ namespace ImageApp.BLL.Implementation
 		{
 			try
 			{
-				using (var client = new HttpClient())
+				using (_httpClient)
 				{
 					var parameters = $"api_key={_ApiKey}&email={emailAddress}";
-					var response = await client.GetAsync($"{_Url}?{parameters}");
+					var response = await _httpClient.GetAsync($"{_Url}?{parameters}");
 					response.EnsureSuccessStatusCode();
 
 					var responseContent = await response.Content.ReadAsStringAsync();
-					var getResponse = JsonConvert.DeserializeObject<ResolveBankResponse>(listResponse);
-					if (responseContent.) { }
-					return true; 
+					var getResponse = JsonConvert.DeserializeObject<dynamic>(responseContent).status;
+					if (getResponse == "valid")
+					{
+						return true;
+					}
+					return false;
 				}
 			}
 			catch (Exception ex)
 			{
-				// Handle any exceptions that occurred during the API call
 				Console.WriteLine("Error verifying email: " + ex.Message);
 				return false;
 			}
-			throw new NotImplementedException();
 		}
 	}
 }
