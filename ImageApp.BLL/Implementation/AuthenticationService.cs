@@ -1,47 +1,87 @@
-﻿using ImageApp.BLL.Interface;
+﻿using ImageApp.BLL.Extensions;
+using ImageApp.BLL.Interface;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using MimeKit;
 using Newtonsoft.Json;
+using User = ImageApp.DAL.Entities.User;
+
 
 namespace ImageApp.BLL.Implementation
 {
 	public class AuthenticationService : IAuthenticationService
 	{
+		private readonly EmailSenderOptions _emailSenderOptions;
+		private readonly UserManager<User> _userManager;
 		private readonly IConfiguration _configuration;
-		private readonly string VerificationUrl = "https://api.zerobounce.net/v2/validate";
-		private readonly HttpClient _httpClient;
 		private string? _ApiKey;
 		private string? _Url;
 
-		public AuthenticationService(IConfiguration configuration)
+		public AuthenticationService(IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor)
 		{
+			_userManager = userManager;
 			_configuration = configuration;
-			_ApiKey = _configuration.GetSection("ZeroBook")?.GetSection("ApiKey")?.Value;
-			_Url = _configuration.GetSection("ZeroBook")?.GetSection("Url")?.Value;
-			_httpClient = new HttpClient();
+			_emailSenderOptions = optionsAccessor.Value;
+			_ApiKey = _configuration.GetSection("ZeroBook").GetSection("ApiKey")?.Value;
+			_Url = _configuration.GetSection("ZeroBook").GetSection("Url")?.Value;
 		}
-		public Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
+		public async Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
 		{
-			throw new NotImplementedException();
-		}
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return (false, "Error");
+			}
 
-		public Task Execute(string apiKey, string subject, string message, string email)
+			var result = await _userManager.ConfirmEmailAsync(user, code);
+			if (result.Succeeded)
+			{
+				return (true, "EmailConfirmed");
+			}
+			return (false, "Invalid Verification Code");
+		}
+		public async Task<(bool successful, string msg)> SendEmailAsync(string email, string subject, string message)
 		{
-			throw new NotImplementedException();
+			if (string.IsNullOrEmpty(_emailSenderOptions.Password))
+			{
+				return (false, "Null SendGridKey");
+			}
+			await Execute(email, subject, message);
+			return (true, "Verification Mail sent to your Email Address");
 		}
-
-		public Task<(bool successful, string msg)> SendEmailAsync(string email, string subject, string htmlMessage)
+		public async Task<bool> Execute(string email, string subject, string htmlMessage)
 		{
-			throw new NotImplementedException();
-		}
+			var message = new MimeMessage();
+			message.From.Add(new MailboxAddress("Image App", _emailSenderOptions.Username));
+			message.To.Add(new MailboxAddress(email, email));
+			message.Subject = subject;
 
+			var bodyBuilder = new BodyBuilder();
+			bodyBuilder.HtmlBody = htmlMessage;
+			message.Body = bodyBuilder.ToMessageBody();
+
+			using (var client = new SmtpClient())
+			{
+			
+				client.Connect(_emailSenderOptions.SmtpServer, _emailSenderOptions.Port, true);
+				client.Authenticate(_emailSenderOptions.Email, _emailSenderOptions.Password);
+				client.Send(message);
+				client.Disconnect(true);
+				
+            }
+
+			return true;
+		}
 		public async Task<bool> VerifyEmail(string emailAddress)
 		{
 			try
 			{
-				using (_httpClient)
+				using (var httpClient = new HttpClient())
 				{
 					var parameters = $"api_key={_ApiKey}&email={emailAddress}";
-					var response = await _httpClient.GetAsync($"{_Url}?{parameters}");
+					var response = await httpClient.GetAsync($"{_Url}?{parameters}");
 					response.EnsureSuccessStatusCode();
 
 					var responseContent = await response.Content.ReadAsStringAsync();
@@ -59,5 +99,6 @@ namespace ImageApp.BLL.Implementation
 				return false;
 			}
 		}
+       
 	}
 }

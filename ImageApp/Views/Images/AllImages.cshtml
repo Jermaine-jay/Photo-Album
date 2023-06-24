@@ -5,6 +5,8 @@
 
 @model IEnumerable<ImageApp.BLL.Models.AllPicturesVM>
 
+
+<section class="w-75 mt-5 mx-auto d-block">
 @if (@TempData["SuccessMsg"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -21,14 +23,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-
-
-<section class="breadcrumbs">
-    <div class="container">
-    </div>
-</section>
-
-<div>
 
     <table class="table">
         <thead class="thead-dark">
@@ -67,6 +61,7 @@
             </tbody>
         }
     </table>
+</section>
 
 @section Scripts
     {

@@ -64,6 +64,24 @@ body {
     font-size: 15px;
 }
 
+.form-v5-content2 {
+    background: #fff;
+    width: 400px;
+    border-radius: 8px;
+    -o-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    margin: 100px 0;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    font-weight: 400;
+    position: relative;
+    font-size: 15px;
+    align-items:center;
+    justify-content:center
+}
+
     .form-v5-content .form-detail {
         padding: 20px 35px 20px 35px;
         position: relative;
@@ -986,3 +1004,7 @@ section {
         .portfolio-details .portfolio-description p {
             padding: 0;
         }
+
+.waiting {
+    margin: 10px
+}

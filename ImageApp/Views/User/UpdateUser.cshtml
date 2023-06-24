@@ -30,8 +30,7 @@
 			<div class="alert-danger" asp-validation-summary="@ValidationSummary.ModelOnly"></div>
 			<h2>Update Account</h2>
 
-			<div class="form-row">
-				
+			<div class="form-row">			
 				<input type="hidden" class="input-text" asp-for="@Model.Id" required />
 				<span asp-validation-for="@Model.Id" style="color: red"></span>
 			</div>
@@ -71,8 +70,9 @@
 			</div>
 
 			<div class="form-row">
+				<label asp-for="@Model.DateOfBirth" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.DateOfBirth" required />
-				<span asp-validation-for="@Model.DateOfBirth"></span>
+				<span asp-validation-for="@Model.DateOfBirth" style="color: red"></span>
 			</div>
 
 			<div class="form-row-last">

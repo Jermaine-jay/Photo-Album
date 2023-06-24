@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace ImageApp.Controllers
 {
 	//[AutoValidateAntiforgeryToken]
-	[Route("[controller]/[action]/{pictureid?}")]
+	[Route("[controller]/[action]/{id?}")]
 	public class ImagesController : Controller
 	{
 		private readonly IUploadImageService _UploadImage;
@@ -30,16 +30,22 @@ namespace ImageApp.Controllers
 		}
 
 		/*[Authorize(Roles = Roles.User)]*/
-		public IActionResult NewImage()
+		[HttpPost]
+		public IActionResult NewImage(string? pictureId)
 		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if(pictureId == null)
+			{
+				return View(new AddOrUpdatePictureVM { UserId = userId});
 
-			return View(new AddOrUpdatePictureVM());
+			}
+			return View(new AddOrUpdatePictureVM { UserId = userId, PictureId = pictureId });
 		}
 
-		[HttpGet("{userId?}")]
-        public async Task<IActionResult> GetPicture(string pictureId, string userId)
+		[HttpGet]
+        public async Task<IActionResult> GetPicture(string pictureId)
         {
-            //var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var model = await _propertyService.GetPicture(userId, pictureId);
             return View(model);
         }
@@ -50,7 +56,6 @@ namespace ImageApp.Controllers
 			var model = await _UploadImage.GetImages();
 			return View(model);
 		}
-
 
 		[HttpPost]
 		public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
@@ -70,7 +75,7 @@ namespace ImageApp.Controllers
 			return View("NewImage");
 		}
 
-		[HttpPost]
+		//[HttpPost]
         public async Task<IActionResult> DeleteImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -34,32 +34,32 @@
 			<div class="form-row">
 				<label asp-for="@Model.Username" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Username" required />
-				<span asp-validation-for="@Model.Username"></span>
+					<span asp-validation-for="@Model.Username" style="color: red;"></span>
 				<i class="fas fa-user p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.Email" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Email" required />
-				<span asp-validation-for="@Model.Email"></span>
+					<span asp-validation-for="@Model.Email" style="color: red;"></span>
 				<i class="fas fa-envelope p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.PhoneNumber" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.PhoneNumber" required />
-				<span asp-validation-for="@Model.PhoneNumber"></span>
+					<span asp-validation-for="@Model.PhoneNumber" style="color: red;"></span>
 				<i class="fas fa-phone p-2"></i>
 			</div>
 			<div class="form-row">
 				<label asp-for="@Model.Address" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Address" required />
-				<span asp-validation-for="@Model.Address"></span>
+					<span asp-validation-for="@Model.Address" style="color: red;"></span>
 				<i class="fas fa-address-card p-2"></i>
 			</div>
 
 			<div class="form-row">
 				<label asp-for="@Model.DateOfBirth" class="form-label"></label>
 				<input type="date" class="input-text" asp-for="@Model.DateOfBirth" required />
-				<span asp-validation-for="@Model.DateOfBirth"></span>
+					<span asp-validation-for="@Model.DateOfBirth" style="color: red;"></span>
 				
 			</div>
 
@@ -73,20 +73,23 @@
 			<div class="form-row">
 				<label asp-for="@Model.Password" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.Password" required />
-				<span asp-validation-for="@Model.Password"></span>
+					<span asp-validation-for="@Model.Password" style="color: red;"></span>
 				<i class="fas fa-lock p-2"></i>
 			</div>
 
 			<div class="form-row">
 				<label asp-for="@Model.ConfirmPassword" class="form-label"></label>
 				<input type="text" class="input-text" asp-for="@Model.ConfirmPassword" required />
-				<span asp-validation-for="@Model.ConfirmPassword"></span>
+					<span asp-validation-for="@Model.ConfirmPassword" style="color: red;"></span>
 				<i class="fas fa-lock p-2"></i>
 			</div>
 
-
 			<div class="form-row-last">
 				<input type="submit" name="register" class="register" value="Register">
+			</div>
+
+			<div class="form-row-last">
+				<p class="small mb-0">Already have an account? <a asp-area=" " asp-controller="User" asp-action="SignIn">Sign In</a></p>
 			</div>
 		</form>
 	</div>

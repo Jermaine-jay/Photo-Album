@@ -1,3 +1,4 @@
+using ImageApp.BLL.Extensions;
 using ImageApp.DAL.DataBase;
 using ImageApp.DAL.Repository;
 using ImageApp.Extensions;
@@ -11,7 +12,9 @@ builder.Services.AddDbContext<ImageAppDbContext>(opts =>
     var defaultConn = builder.Configuration.GetSection("ConnectionString")["DefaultConn"];
     opts.UseSqlServer(defaultConn);
 });
-
+//builder.Services.AddTransient<Authen, EmailSender>();
+builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
+builder.Services.Configure<MailjetOptions>(builder.Configuration.GetSection("MailjetOptions"));
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterServices();

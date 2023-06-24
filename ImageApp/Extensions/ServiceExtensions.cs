@@ -3,19 +3,22 @@ using ImageApp.BLL.Interface;
 using ImageApp.DAL.DataBase;
 using ImageApp.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
-using System;
 
 namespace ImageApp.Extensions
 {
     public static class ServiceExtensions
     {
+        private static readonly IConfiguration configuration;
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddScoped<IUploadImageService, UploadImageService>();
             services.AddScoped<IUserServices, UserServices>();
-			services.AddScoped<IPropertyService, PropertyService>();
-			services.AddScoped<IAuthenticationService, AuthenticationService>();
-			services.AddHttpContextAccessor();
+            services.AddScoped<IPropertyService, PropertyService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IRecoveryService, RecoveryService>();
+            services.AddHttpContextAccessor();
+
+            //services.Configure<EmailSenderOptions>(configuration.GetSection("EmailSenderOptions"));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -35,38 +38,33 @@ namespace ImageApp.Extensions
                 opt.Lockout.MaxFailedAccessAttempts = 3;
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             });
-                services.AddHttpContextAccessor();
-                services.ConfigureApplicationCookie(options =>
-                {
-                    options.LoginPath = "/User/SignIn";
-                });
+            services.AddHttpContextAccessor();
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/User/SignIn";
+            });
         }
 
         public static void Configure(IServiceProvider serviceProvider)
         {
-            // Other app configurations
-
-            // Create roles
             CreateRoles(serviceProvider).Wait();
-
-            // Other app configurations
         }
 
         private static async Task CreateRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            
+
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
-              
+
                 var role = new IdentityRole("Admin");
                 await roleManager.CreateAsync(role);
             }
 
             if (!await roleManager.RoleExistsAsync("User"))
             {
-               
+
                 var role = new IdentityRole("User");
                 await roleManager.CreateAsync(role);
             }

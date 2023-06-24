@@ -1,9 +1,10 @@
-﻿using ImageApp.BLL.Implementation;
-using ImageApp.BLL.Interface;
+﻿using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using System.Security.Claims;
 
 namespace ImageApp.Controllers
@@ -15,52 +16,62 @@ namespace ImageApp.Controllers
 		private readonly IUserServices _userServices;
 		private readonly SignInManager<User> _userManager;
 		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly IUrlHelperFactory _urlHelperFactory;
+		private readonly IAuthenticationService _authenticationService;
+		private readonly IRecoveryService _recoveryService;
 
-		public UserController(IUserServices userServices, SignInManager<User> userManager, IHttpContextAccessor httpContextAccessor)
+		public UserController(IUserServices userServices, SignInManager<User> userManager, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAuthenticationService authenticationService)
 		{
 			_userServices = userServices;
 			_userManager = userManager;
 			_httpContextAccessor = httpContextAccessor;
+			_urlHelperFactory = urlHelperFactory;
+			_authenticationService = authenticationService;
 		}
-		public IActionResult Index()
+		public IActionResult WaitingPage()
 		{
 			return View();
 		}
 
-        public IActionResult RegisterUser()
-        {
-            return View(new RegisterVM());
-        }
+		public IActionResult RegisterUser()
+		{
+			return View(new RegisterVM());
+		}
 
-        public IActionResult RegisterAdmin()
-        {
-            return View(new RegisterVM());
-        }
+		public IActionResult RegisterAdmin()
+		{
+			return View(new RegisterVM());
+		}
 
-        public async Task<IActionResult> Profile()
-        {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userServices.UserProfileAsync(userId);
-            if (user == null)
-            {
-                return View(new ProfileVM());
-            }
-            return View(user);
-        }
-
-        public async Task<IActionResult> AllUsers()
-        {
-            var model = await _userServices.GetUsers();
-            return View(model);
-        }
-
-        public async Task<IActionResult> UpdateUser()
+		public async Task<IActionResult> Profile()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var user = await _userServices.GetUser(userId);
-			
-			/*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
+			var user = await _userServices.UserProfileAsync(userId);
+			if (user == null)
+			{
+				return View(new ProfileVM());
+			}
 			return View(user);
+		}
+
+		public async Task<IActionResult> AllUsers()
+		{
+			var model = await _userServices.GetUsers();
+			return View(model);
+		}
+	
+		public async Task<IActionResult> UpdateUser(string? Id)
+		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if(Id != null)
+			{
+				var result = await _userServices.GetUser(Id);
+				return View(result);
+			}
+			var user = await _userServices.GetUser(Id);
+			return View(userId);
+
+			/*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
 		}
 
 		public IActionResult SignIn()
@@ -68,16 +79,43 @@ namespace ImageApp.Controllers
 			return View(new SignInVM());
 		}
 
+		public IActionResult ResetPassword(string? code)
+		{
+			if (code == null)
+			{
+				return RedirectToAction("Error");
+			}
+
+			var Email = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
+			var model = new ResetPasswordVM { Code = code, Email = Email };
+			return View(model);
+		}
+
+		public async Task<IActionResult> ConfirmEmail(string code)
+		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var (successful, msg) = await _authenticationService.ConfirmEmail(userId, code);
+			if (successful)
+			{
+				TempData["SuccessMsg"] = msg;
+				return RedirectToAction("SignIn");
+			}
+			TempData["ErrMsg"] = msg;
+			return View("ConfirmEmail");
+		}
+
 		[HttpPost]
 		public async Task<IActionResult> SaveUser(RegisterVM model)
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.RegisterUser(model);
+				var Protocol = _httpContextAccessor?.HttpContext?.Request.Scheme;
+				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);		
+				var (successful, msg) = await _userServices.RegisterUser(urlHelper, Protocol,model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
-					return RedirectToAction("SignIn");
+					return RedirectToAction("WaitingPage");
 				}
 				TempData["ErrMsg"] = msg;
 				return View("RegisterUser");
@@ -154,21 +192,53 @@ namespace ImageApp.Controllers
 		}
 
 		[HttpPost]
-        public async Task<IActionResult> DeleteUser(string userId)
-        {
-            if (ModelState.IsValid)
-            {
-                var (successful, msg) = await _userServices.DeleteAsync(userId);
-                if (successful)
-                {
-                    TempData["SuccessMsg"] = msg;
-                    return RedirectToAction("AllUsers");
-                }
-                TempData["ErrMsg"] = msg;
-                return View("AllUsers");
-            }
-            return View("AllUsers");
-        }
+		public async Task<IActionResult> DeleteUser(string userId)
+		{
+			if (ModelState.IsValid)
+			{
+				var (successful, msg) = await _userServices.DeleteAsync(userId);
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("AllUsers");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("AllUsers");
+			}
+			return View("AllUsers");
+		}
 
-    }
+		[HttpPost]
+		public async Task<IActionResult> ResetUserPassword(ResetPasswordVM model)
+		{
+			if (ModelState.IsValid)
+			{
+				var (successful, msg) = await _recoveryService.ResetPassword(model);
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("Profile");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("ResetPassword");
+			}
+			return View("ResetPassword");
+		}
+
+		public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+		{
+			/*var Email = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);*/
+			var Protocol = _httpContextAccessor?.HttpContext?.Request.Scheme;
+			var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
+			var (successful, msg) = await _recoveryService.ForgotPassword(urlHelper, Protocol,model.Email);
+
+			if (successful)
+			{
+				TempData["SuccessMsg"] = msg;
+				return RedirectToAction("WaitingPage");
+			}
+			TempData["ErrMsg"] = msg;
+			return View("WaitingPage");
+		}
+	}
 }

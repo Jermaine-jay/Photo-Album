@@ -1,0 +1,32 @@
+﻿@{
+	ViewBag.Title = "title";
+	Layout = "_Layout";
+}
+
+<section class="waiting">
+	<div class="page-content shadow-sm p-3 mb-5 bg-white rounded w-50">
+		@if (@TempData["SuccessMsg"] != null)
+		{
+			<div class="fade show w-55 mx-auto d-block" role="alert">
+				<h3><strong>Success!</strong> @TempData["SuccessMsg"]</h3>
+			</div>
+		}
+
+
+		@if (@TempData["ErrMsg"] != null)
+		{
+			<div class=" w-55 mx-auto d-block" role="alert">
+				<h3><strong>Error!</strong> @TempData["ErrMsg"]</h3>		
+			</div>
+		}
+
+	<h2>Witing page</h2>
+	</div>
+</section>
+@section Scripts
+	{
+	@{
+		Html.RenderPartial("_ValidationScriptsPartial");
+	}
+
+}
