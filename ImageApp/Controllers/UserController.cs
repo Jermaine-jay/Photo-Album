@@ -14,23 +14,26 @@ namespace ImageApp.Controllers
 	public class UserController : Controller
 	{
 		private readonly IUserServices _userServices;
-		private readonly SignInManager<User> _userManager;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly IUrlHelperFactory _urlHelperFactory;
 		private readonly IAuthenticationService _authenticationService;
 		private readonly IRecoveryService _recoveryService;
 
-		public UserController(IUserServices userServices, SignInManager<User> userManager, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAuthenticationService authenticationService)
+		public UserController(IUserServices userServices, IRecoveryService recoveryService, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAuthenticationService authenticationService)
 		{
 			_userServices = userServices;
-			_userManager = userManager;
 			_httpContextAccessor = httpContextAccessor;
 			_urlHelperFactory = urlHelperFactory;
 			_authenticationService = authenticationService;
+			_recoveryService = recoveryService;
 		}
 		public IActionResult WaitingPage()
 		{
 			return View();
+		}
+		public IActionResult ForgotPassword()
+		{
+			return View(new ForgotPasswordVM());
 		}
 
 		public IActionResult RegisterUser()
@@ -79,15 +82,13 @@ namespace ImageApp.Controllers
 			return View(new SignInVM());
 		}
 
-		public IActionResult ResetPassword(string? code)
+		public IActionResult ResetPassword(string? code, string userId)
 		{
 			if (code == null)
 			{
 				return RedirectToAction("Error");
 			}
-
-			var Email = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
-			var model = new ResetPasswordVM { Code = code, Email = Email };
+			var model = new ResetPasswordVM { Code = code, UserId = userId };
 			return View(model);
 		}
 
@@ -101,7 +102,7 @@ namespace ImageApp.Controllers
 				return RedirectToAction("SignIn");
 			}
 			TempData["ErrMsg"] = msg;
-			return View("ConfirmEmail");
+			return View("SignIn");
 		}
 
 		[HttpPost]
@@ -109,9 +110,8 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var Protocol = _httpContextAccessor?.HttpContext?.Request.Scheme;
 				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);		
-				var (successful, msg) = await _userServices.RegisterUser(urlHelper, Protocol,model);
+				var (successful, msg) = await _userServices.RegisterUser(urlHelper,model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -128,11 +128,12 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.RegisterAdmin(model);
+				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
+				var (successful, msg) = await _userServices.RegisterUser(urlHelper, model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
-					return RedirectToAction("SignIn");
+					return RedirectToAction("WaitingPage");
 				}
 				TempData["ErrMsg"] = msg;
 				return View("RegisterAdmin");
@@ -165,14 +166,13 @@ namespace ImageApp.Controllers
 				var (successful, msg) = await _userServices.SignIn(model);
 				if (successful)
 				{
-
 					TempData["SuccessMsg"] = msg;
 					return RedirectToAction("Profile");
 				}
 				TempData["ErrMsg"] = msg;
-				return View("Profile");
+				return View("signIn");
 			}
-			return View("Profile");
+			return View("signIn");
 		}
 
 		public async Task<IActionResult> SignOut()
@@ -183,12 +183,12 @@ namespace ImageApp.Controllers
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
-					return RedirectToAction("Index", "Home");
+					return RedirectToAction("SignIn");
 				}
 				TempData["ErrMsg"] = msg;
-				return View("Index", "Home");
+				return View("SignIn");
 			}
-			return View("Index", "Home");
+			return View("SignIn");
 		}
 
 		[HttpPost]
@@ -209,6 +209,7 @@ namespace ImageApp.Controllers
 		}
 
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ResetUserPassword(ResetPasswordVM model)
 		{
 			if (ModelState.IsValid)
@@ -217,7 +218,7 @@ namespace ImageApp.Controllers
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
-					return RedirectToAction("Profile");
+					return RedirectToAction("SignIn");
 				}
 				TempData["ErrMsg"] = msg;
 				return View("ResetPassword");
@@ -225,20 +226,25 @@ namespace ImageApp.Controllers
 			return View("ResetPassword");
 		}
 
-		public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UserForgotPassword(ForgotPasswordVM model)
 		{
-			/*var Email = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);*/
-			var Protocol = _httpContextAccessor?.HttpContext?.Request.Scheme;
-			var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
-			var (successful, msg) = await _recoveryService.ForgotPassword(urlHelper, Protocol,model.Email);
-
-			if (successful)
+			if (ModelState.IsValid)
 			{
-				TempData["SuccessMsg"] = msg;
-				return RedirectToAction("WaitingPage");
+				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
+				var (successful, msg) = await _recoveryService.ForgotPassword(urlHelper, model);
+
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("WaitingPage");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("WaitingPage");
 			}
-			TempData["ErrMsg"] = msg;
 			return View("WaitingPage");
+
 		}
 	}
 }

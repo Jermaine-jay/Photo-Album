@@ -1,82 +1,78 @@
-﻿using AutoMapper;
-using ImageApp.BLL.Extensions;
-using ImageApp.BLL.Interface;
+﻿using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImageApp.BLL.Implementation
 {
-	public class RecoveryService : IRecoveryService
-	{
-		private readonly UserManager<User> _userManager;
-		private readonly SignInManager<User> _signInManager;
-		private readonly IMapper _mapper;
-		private readonly IRepository<User> _userRepo;
-		private readonly IUnitOfWork _unitOfWork;
-		private readonly IAuthenticationService _authenticationService;
-		private readonly HttpContext _httpContext;
-		private RoleManager<IdentityRole> _roleManager { get; }
+    public class RecoveryService : IRecoveryService
+    {
+        private readonly UserManager<User> _userManager;
+        private readonly IRepository<User> _userRepo;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IGenerateEmailVerificationPage _generateEmailVerificationPage;
 
-		public RecoveryService(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
-		{
-			_userManager = userManager;
-			_signInManager = signInManager;
-			_roleManager = roleManager;
-			_unitOfWork = unitOfWork;
-			_userRepo = _unitOfWork?.GetRepository<User>();
-			_mapper = mapper;
-			_authenticationService = authenticationService;
-		}
-		public Task<(bool successful, string msg)> ChangeEmail(string userId, string code)
-		{
-			throw new NotImplementedException();
-		}
+        public RecoveryService(UserManager<User> userManager, IUnitOfWork unitOfWork, IGenerateEmailVerificationPage Page, IAuthenticationService Service)
+        {
+            _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _userRepo = _unitOfWork?.GetRepository<User>();
+            _authenticationService = Service;
+            _generateEmailVerificationPage = Page;
+        }
 
-		public async Task<(bool successful, string msg)> ForgotPassword(IUrlHelper urlHelper, string Protocol, string Email)
-		{
-			var user = await _userManager.FindByEmailAsync(Email);
-			if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-			{
-				return (false, "User doesn't exist");
-			}
+        public Task<(bool successful, string msg)> ChangeEmail(string userId, string code)
+        {
+            throw new NotImplementedException();
+        }
 
-			var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-			var callbackUrl = urlHelper.Action("ResetPassword", "User", new { userId = user.Id, code }, protocol: Protocol);
+        public async Task<(bool successful, string msg)> ForgotPassword(IUrlHelper urlHelper, ForgotPasswordVM model)
+        {
+            var verify = await _authenticationService.VerifyEmail(model.Email);
+            if (verify == false)
+            {
+                return (false, "Invalid Email Address");
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                return (false, "User doesn't exist");
+            }
 
-			await _authenticationService.SendEmailAsync(Email, "Reset Password", GenerateEmailVerificationPage.PasswordResetPage(callbackUrl));
-			return (true, "Reset Password Email Sent");
-		}
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = urlHelper.Action("ResetPassword", "User", new { UserId = user.Id, code }, protocol: "https");
 
-		public Task<(bool successful, string msg)> ResetEmail(string userId, string code)
-		{
-			throw new NotImplementedException();
-		}
+            await _authenticationService.SendEmailAsync(model.Email, "Reset Password", _generateEmailVerificationPage.PasswordResetPage(callbackUrl));
+            return (true, "Reset Password Email Sent");
+        }
 
-		public async Task<(bool successful, string msg)> ResetPassword(ResetPasswordVM model)
-		{
-			var user = await _userManager.FindByEmailAsync(model.Email);
-			if (user == null)
-			{
-				return (false, "User does not exist!");
-			}
+        public Task<(bool successful, string msg)> ResetEmail(string userId, string code)
+        {
+            throw new NotImplementedException();
+        }
 
-			var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-			if (result.Succeeded)
-			{
-				return (true, "Password Reset Complete");
-			}
-			else
-			{
-				foreach (var error in result.Errors)
-				{
-					return (false, $"Couldn't reset password, {error.Description}");
-				}
-			}
-			throw new NotImplementedException();
-		}
-	}
+        public async Task<(bool successful, string msg)> ResetPassword(ResetPasswordVM model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user != null)
+            {
+                var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    return (true, "Password Reset Complete");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        return (false, $"Couldn't reset password, {error.Description}");
+                    }
+                }
+            }
+            return (false, "User does not exist!");
+        }
+    }
 }

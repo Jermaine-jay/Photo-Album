@@ -40,7 +40,13 @@
                 <div class="col-lg-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
                     <div class="portfolio-item filter-app">
                     <div class="portfolio-wrap">
-                        <img src="~/img/@Model.ProfileImagePath" class="img-fluid" alt="">
+                    @if (Model.ProfileImagePath == null)
+                    {
+                        <img src="~/img/Blank-Pfp.jpg" class="img-fluid" alt="">
+                    }
+                    else{                             
+                          <img src="~/img/@Model.ProfileImagePath" class="img-fluid" alt="">
+                        }
                         <div class="portfolio-info">
                             <h4>@Model.UserName</h4>
                             <div class="portfolio-links">

@@ -4,6 +4,7 @@ using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -12,6 +13,7 @@ namespace ImageApp.BLL.Implementation
 		private readonly IMapper _mapper;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IRepository<Picture> _productRepo;
+		private readonly IRepository<User> _userRepo;
 		private readonly IWebHostEnvironment _webHostEnvironment;
 		private readonly IPropertyService _propertyService;
 
@@ -20,6 +22,7 @@ namespace ImageApp.BLL.Implementation
 			_mapper = mapper;
 			_unitOfWork = unitOfWork;
 			_productRepo = _unitOfWork.GetRepository<Picture>();
+            _userRepo = _unitOfWork.GetRepository<User>();
 			_webHostEnvironment = webHostEnvironment;
 		}
 
@@ -50,16 +53,21 @@ namespace ImageApp.BLL.Implementation
 			return result;
 		}
 
-		public async Task<IEnumerable<AllPicturesVM>> GetImages()
+		public async Task<IEnumerable<UserWithPicturesVM>> GetImages()
 		{
-			var product = await _productRepo.GetAllAsync();
-			var productViewModels = product.Select(u => new AllPicturesVM
+			var user = await _userRepo.GetAllAsync(include: u => u.Include(x => x.Pictures));
+			return	user.Select(u => new UserWithPicturesVM
 			{
-				Name = u.Name,
-				Description = u.Description,
-				ImageFile = u.ImageFile,
+				Id = u.Id,
+				UserName = u.UserName,
+				Gender = u.Gender.ToString(),
+				Pictures = u.Pictures.Select(x => new Picture
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UserId = x.UserId,
+				})
 			});
-			return productViewModels;
 		}
 	}
 }

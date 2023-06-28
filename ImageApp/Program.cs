@@ -14,7 +14,7 @@ builder.Services.AddDbContext<ImageAppDbContext>(opts =>
 });
 //builder.Services.AddTransient<Authen, EmailSender>();
 builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
-builder.Services.Configure<MailjetOptions>(builder.Configuration.GetSection("MailjetOptions"));
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterServices();

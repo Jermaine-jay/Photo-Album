@@ -1,9 +1,12 @@
 ﻿using ImageApp.BLL.Extensions;
 using ImageApp.BLL.Interface;
+using ImageApp.BLL.Models;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 using MimeKit;
 using Newtonsoft.Json;
 using User = ImageApp.DAL.Entities.User;
@@ -11,23 +14,28 @@ using User = ImageApp.DAL.Entities.User;
 
 namespace ImageApp.BLL.Implementation
 {
-	public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
 	{
 		private readonly EmailSenderOptions _emailSenderOptions;
 		private readonly UserManager<User> _userManager;
 		private readonly IConfiguration _configuration;
+		private readonly IGenerateEmailVerificationPage _generateEmailVerificationPage;
+
 		private string? _ApiKey;
 		private string? _Url;
 
-		public AuthenticationService(IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor)
+		public AuthenticationService(IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
 		{
 			_userManager = userManager;
 			_configuration = configuration;
 			_emailSenderOptions = optionsAccessor.Value;
 			_ApiKey = _configuration.GetSection("ZeroBook").GetSection("ApiKey")?.Value;
 			_Url = _configuration.GetSection("ZeroBook").GetSection("Url")?.Value;
+            _generateEmailVerificationPage = Page;
 		}
-		public async Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
+
+
+        public async Task<(bool successful, string msg)> ConfirmEmail(string userId, string code)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
@@ -99,6 +107,16 @@ namespace ImageApp.BLL.Implementation
 				return false;
 			}
 		}
-       
+
+		public async Task<bool> RegistrationMail(IUrlHelper urlHelper, User newUser)
+		{
+			var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+			var callbackUrl = urlHelper.Action("ConfirmEmail", "User", new { userId = newUser.Id, code }, protocol: "https");
+			_ = await SendEmailAsync(newUser.Email, "Confirm your email",
+				_generateEmailVerificationPage.EmailVerificationPage(newUser.UserName, callbackUrl));
+
+			return true;
+		}
+
 	}
 }

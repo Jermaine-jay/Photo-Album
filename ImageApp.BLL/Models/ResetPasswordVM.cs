@@ -4,8 +4,7 @@ namespace ImageApp.BLL.Models
 {
 	public class ResetPasswordVM
 	{
-		[Required, DataType(DataType.EmailAddress)]
-		public string Email { get; set; }
+		public string UserId { get; set; }
 
 		public string Code { get; set; }
 

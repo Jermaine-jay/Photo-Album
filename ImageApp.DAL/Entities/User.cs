@@ -10,7 +10,7 @@ namespace ImageApp.DAL.Entities
         public string? Age { get; set; }
         public Gender Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string ProfileImagePath { get; set; } = "Blank-Pfp.jpg";
+        public string? ProfileImagePath { get; set; }
         public IList<Picture>? Pictures { get; set; }
     }
 }

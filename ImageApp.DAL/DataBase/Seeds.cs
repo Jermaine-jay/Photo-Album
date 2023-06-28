@@ -30,7 +30,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "Holiday picture",
                     Description = "Went to the woods in november 2018",
                     ImageFile = "Eel and heron.jpg",
-                    UserId = "d803883c-7940-44cb-8c7d-01f8d04f2a37"
+                    UserId = "e22d6ebf-f589-43f9-a44d-9813d6be3df0"
                 },
 
                 new Picture()
@@ -38,7 +38,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "Summer picnic park picture",
                     Description = "Went on a picnic in january 1st 2019, with my friends",
                     ImageFile = "Bronze-art-silva.jpg",
-                    UserId = "d803883c-7940-44cb-8c7d-01f8d04f2a37"
+                    UserId = "e22d6ebf-f589-43f9-a44d-9813d6be3df0"
 
                 },
 
@@ -47,7 +47,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "Skating on ice",
                     Description = "went for ice skating in april 2019 with my dad",
                     ImageFile = "1966 Ford Mustang Fastback C-Code.jpg",
-                    UserId = "d803883c-7940-44cb-8c7d-01f8d04f2a37"
+                    UserId = "e22d6ebf-f589-43f9-a44d-9813d6be3df0"
 
                 },
 
@@ -65,7 +65,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "Playing football in spring",
                     Description = "went to play football in april 2020 with my friends",
                     ImageFile = "1990 Porsche 964 Carrera Targa.jpg",
-                    UserId = "933dd5be-6780-4287-b6f3-e52613d32e19"
+                    UserId = "b32f3eed-4b3e-4954-8d3d-6a2e9932e00c"
 
                 },
 
@@ -74,7 +74,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "Random picture",
                     Description = "Took some random picture with my friends in campus(2017)",
                     ImageFile = "1987 BMW 325E.jpg",
-                    UserId = "933dd5be-6780-4287-b6f3-e52613d32e19"
+                    UserId = "b32f3eed-4b3e-4954-8d3d-6a2e9932e00c"
 
                 },
 
@@ -83,7 +83,7 @@ namespace ImageApp.DAL.DataBase
                     Name = "St Anthony's harvest 2017",
                     Description = "Harvest celebration before covid 19",
                     ImageFile = "Bronze-art-silva.jpg",
-                    UserId = "933dd5be-6780-4287-b6f3-e52613d32e19"
+                    UserId = "b32f3eed-4b3e-4954-8d3d-6a2e9932e00c"
 
                 },
 

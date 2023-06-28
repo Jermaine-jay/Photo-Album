@@ -20,7 +20,7 @@ body {
 /*--------------------------------------------------------------
 # Portfolio
 --------------------------------------------------------------*/
-.portfolio #portfolio-flters {
+.portfolio .portfolio-flters {
     padding: 0;
     margin: 0 auto 25px auto;
     list-style: none;
@@ -28,7 +28,7 @@ body {
     border-radius: 50px;
 }
 
-    .portfolio #portfolio-flters li {
+    .portfolio .portfolio-flters li {
         cursor: pointer;
         display: inline-block;
         padding: 7px 17px 9px 17px;
@@ -42,13 +42,13 @@ body {
         border-radius: 50px;
     }
 
-        .portfolio #portfolio-flters li:hover,
-        .portfolio #portfolio-flters li.filter-active {
+        .portfolio .portfolio-flters li:hover
+        {
             color: #fff;
             background: #e43c5c;
         }
 
-        .portfolio #portfolio-flters li:last-child {
+        .portfolio .portfolio-flters li:last-child {
             margin-right: 0;
         }
 

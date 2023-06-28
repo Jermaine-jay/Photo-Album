@@ -30,8 +30,8 @@ namespace ImageApp.Controllers
 		}
 
 		/*[Authorize(Roles = Roles.User)]*/
-		[HttpPost]
-		public IActionResult NewImage(string? pictureId)
+		[HttpGet("{pictureId?}")]
+		public async Task<IActionResult> NewImage(string? pictureId)
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(pictureId == null)
@@ -75,7 +75,7 @@ namespace ImageApp.Controllers
 			return View("NewImage");
 		}
 
-		//[HttpPost]
+		[HttpGet]
         public async Task<IActionResult> DeleteImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);

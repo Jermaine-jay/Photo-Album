@@ -19,21 +19,18 @@ namespace ImageApp.BLL.Implementation
 		private readonly IRepository<User> _userRepo;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IAuthenticationService _authenticationService;
-		private readonly HttpContext _httpContext;
-		private RoleManager<IdentityRole> _roleManager { get; }
 
-		public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
+		public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
-			_roleManager = roleManager;
 			_unitOfWork = unitOfWork;
 			_userRepo = _unitOfWork?.GetRepository<User>();
 			_mapper = mapper;
 			_authenticationService = authenticationService;
 		}
 
-		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
+		public async Task<(bool successful, string msg)> RegisterAdmin(IUrlHelper urlHelper, RegisterVM register)
 		{
 			var (newUser, msg) = await CreateAUser(register);
 			if (newUser == null)
@@ -42,13 +39,25 @@ namespace ImageApp.BLL.Implementation
 			}
 			IdentityResult result = await _userManager.CreateAsync(newUser, register.Password);
 
-			await _userManager.AddToRoleAsync(newUser, "Admin");
-			await _signInManager.SignInAsync(newUser, isPersistent: false);
+			if (result.Succeeded)
+			{
+				_ = _authenticationService.RegistrationMail(urlHelper, newUser);
 
-			return result.Succeeded ? (true, "Admin created successfully!") : (false, "Failed to create Admin");
+				await _userManager.AddToRoleAsync(newUser, "Admin");
+				await _signInManager.SignInAsync(newUser, isPersistent: false);
+				return result.Succeeded ? (true, "User created successfully!, Verification Mail Sent") : (false, "Failed to create User, Couldn't Send Mail");
+			}
+			if (!result.Succeeded)
+			{
+				foreach (var error in result.Errors)
+				{
+					return (false, $"Failed to create User.{error.Description}");
+				}
+			}
+			return (false, $"Failed to create User");
 		}
 
-		public async Task<(bool successful, string msg)> RegisterUser(IUrlHelper urlHelper, string Protocol, RegisterVM register)
+		public async Task<(bool successful, string msg)> RegisterUser(IUrlHelper urlHelper, RegisterVM register)
 		{
 			var (newUser, msg )= await CreateAUser(register);
 			if (newUser == null)
@@ -59,10 +68,7 @@ namespace ImageApp.BLL.Implementation
 
 			if (result.Succeeded)
 			{
-				var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-				var callbackUrl = urlHelper.Action("ConfirmEmail", "User", new { userId = newUser.Id, code }, protocol: Protocol);
-				var a = await _authenticationService.SendEmailAsync(register.Email, "Confirm your email",
-					GenerateEmailVerificationPage.EmailVerificationPage(newUser.UserName, callbackUrl));
+				_ = _authenticationService.RegistrationMail(urlHelper, newUser);
 
 				await _userManager.AddToRoleAsync(newUser, "User");
 				await _signInManager.SignInAsync(newUser, isPersistent: false);

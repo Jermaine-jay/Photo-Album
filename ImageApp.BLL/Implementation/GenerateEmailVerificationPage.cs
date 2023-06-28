@@ -1,10 +1,12 @@
-﻿namespace ImageApp.BLL.Extensions
+﻿using ImageApp.BLL.Interface;
+
+namespace ImageApp.BLL.Implementation
 {
-	public static class GenerateEmailVerificationPage
+    public class GenerateEmailVerificationPage: IGenerateEmailVerificationPage
 	{
-		public static string EmailVerificationPage(string name, string callbackurl)
-		{
-			string html = $@"
+        public string EmailVerificationPage(string name, string callbackurl)
+        {
+            string html = $@"
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -66,19 +68,19 @@
                         <p>We need a little more information to complete your registration, including a confirmation of your email address.</p>
 	                    <p>Click below to confirm your email address:.</p>
                         <div>
-                            <a href='{callbackurl}' value=""verify""></a>
+                            <a href='{callbackurl}'>Verify</a>
                         </div>
                     </div>
                 </body>
                 </html>
             ";
 
-			return html;
-		}
+            return html;
+        }
 
-		public static string PasswordResetPage(string callbackurl)
-		{
-			string html = $@"
+        public string PasswordResetPage(string callbackurl)
+        {
+            string html = $@"
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -139,14 +141,14 @@
                         <p>We need a little more information to complete your account recovery.</p>
 	                    <p>Click below to reset your password.</p>
                         <div>
-                            <a href='{callbackurl}' value=""Change Password""></a>
+                            <a href='{callbackurl}'>Change Password</a>
                         </div>
                     </div>
                 </body>
                 </html>
             ";
 
-			return html;
-		}
-	}
+            return html;
+        }
+    }
 }

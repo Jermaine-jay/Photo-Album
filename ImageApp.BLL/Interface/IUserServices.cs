@@ -6,8 +6,8 @@ namespace ImageApp.BLL.Interface
 {
     public interface IUserServices
     {
-		Task<(bool successful, string msg)> RegisterUser(IUrlHelper urlHelper, string Protocol,RegisterVM register);
-        Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register);
+		Task<(bool successful, string msg)> RegisterUser(IUrlHelper urlHelper,RegisterVM register);
+        Task<(bool successful, string msg)> RegisterAdmin(IUrlHelper urlHelper, RegisterVM register);
         Task<(bool successful, string msg)> SignIn(SignInVM register);
         Task<(bool successful, string msg)> SignOut();
         Task<(bool successful, string msg)> Update(UserVM model);

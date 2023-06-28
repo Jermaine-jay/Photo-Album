@@ -3,8 +3,7 @@
     Layout = "_Layout";
 }
 
-@model IEnumerable<ImageApp.BLL.Models.AllPicturesVM>
-
+@model IEnumerable<ImageApp.BLL.Models.UserWithPicturesVM>
 
 <section class="w-75 mt-5 mx-auto d-block">
 @if (@TempData["SuccessMsg"] != null)
@@ -24,6 +23,9 @@
     </div>
 }
 
+@foreach (var item in Model.Select((value, i) => new { value, i }))
+{
+        <h1>@item.value.UserName</h1>
     <table class="table">
         <thead class="thead-dark">
             <tr>
@@ -34,26 +36,27 @@
             </tr>
         </thead>
 
-        @foreach (var item in Model.Select((value, i) => new { value, i }))
+        @foreach (var picture in item.value.Pictures.Select((value, i) => new { value, i }))
         {
             <tbody>
 
                 <tr>
                     <th scope="row">@(item.i + 1)</th>
-                    <td>@item.value.Name</td>
-                    <td>@item.value.ImageFile</td>
+                    <td>@picture.value.Name</td>
+                    <td>@picture.value.Id</td>
+                    <td>@picture.value.User</td>
                     <td class="d-flex">
 
                         <span class="px-1">
-                            <form action="@Url.Action("UpdateUser", "User", new { userId = @item.value.Id})" method="Get">
-                                <input type="submit" class="btn btn-secondary btn-sm" value="Edit" placeholder="@item.value.Id" />
-                            </form>
+                            <a asp-action="NewImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
+                                <i class="fa-solid fa-pen fa-lg"></i>
+                            </a>
                         </span>
 
-                        <span class="px-1">
-                            <form action="@Url.Action("DeleteImage", "Image", new { PictureId = @item.value.Id})" method="post">
-                                <input type="submit" class="btn btn-danger btn-sm" value="Delete" placeholder="@item.value.Id" />
-                            </form>
+                        <span class="px-1">                        
+                            <a asp-action="DeleteImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
+                                <i class="fa-solid fa-trash fa-lg"></i>
+                            </a>
                         </span>
                     </td>
                 </tr>
@@ -61,6 +64,7 @@
             </tbody>
         }
     </table>
+    }
 </section>
 
 @section Scripts

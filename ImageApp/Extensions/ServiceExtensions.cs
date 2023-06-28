@@ -16,6 +16,7 @@ namespace ImageApp.Extensions
             services.AddScoped<IPropertyService, PropertyService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRecoveryService, RecoveryService>();
+            services.AddScoped<IGenerateEmailVerificationPage, GenerateEmailVerificationPage>();
             services.AddHttpContextAccessor();
 
             //services.Configure<EmailSenderOptions>(configuration.GetSection("EmailSenderOptions"));

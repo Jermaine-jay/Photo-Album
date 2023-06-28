@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ImageApp.BLL.Models
 {
-    public class ForgotPasswordVM
-    {
-        //public string? UserId { get; set; }
-        public string Email { get; set; }
-    }
+	public class ForgotPasswordVM
+	{
+		[Required, DataType(DataType.EmailAddress)]
+		public string Email { get; set; }
+	}
 }
