@@ -12,7 +12,8 @@ builder.Services.AddDbContext<ImageAppDbContext>(opts =>
     var defaultConn = builder.Configuration.GetSection("ConnectionString")["DefaultConn"];
     opts.UseSqlServer(defaultConn);
 });
-//builder.Services.AddTransient<Authen, EmailSender>();
+
+
 builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
 
 
