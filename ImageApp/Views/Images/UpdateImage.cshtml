@@ -3,7 +3,7 @@
 	Layout = "_Layout";
 }
 
-@model ImageApp.BLL.Models.AddOrUpdatePictureVM;
+@model ImageApp.BLL.Models.PictureVM;
 
 <section class="mt-5">
 
@@ -17,17 +17,17 @@
 
 	<div class="page-content">
 		<div class="form-v5-content">
-			<form class="form-detail" asp-controller="Images" asp-action="Save" enctype="multipart/form-data">
+			<form class="form-detail" asp-controller="Images" asp-action="SaveUpdate" enctype="multipart/form-data">
 
 				<div class="alert-danger" asp-validation-summary="@ValidationSummary.ModelOnly"></div>
 				<h2></h2>
 
-				<div class="form-row">				
-					<input type="hidden" class="input-text" asp-for="@Model.UserId" required />				
+				<div class="form-row">
+					<input type="hidden" class="input-text" asp-for="@Model.UserId" required />
 				</div>
 
-				<div class="form-row">				
-					<input type="hidden" class="input-text" asp-for="@Model.PictureId" required />			
+				<div class="form-row">
+					<input type="hidden" class="input-text" asp-for="@Model.PictureId" required />
 				</div>
 
 				<div class="form-row">
@@ -43,10 +43,7 @@
 				</div>
 
 				<div class="form-row">
-					<label asp-for="@Model.ImageFile" class="form-label"></label>
-					<input type="file" asp-for="@Model.ImageFile" class="input-file" accept=".png, .jpg, .jpeg" />
-					<span asp-validation-for="@Model.ImageFile" style="color: red;"></span>
-					
+					<input type="hidden" asp-for="@Model.ImageFile" class="input-file" accept=".png, .jpg, .jpeg" />
 				</div>
 
 				<div class="form-row-last">

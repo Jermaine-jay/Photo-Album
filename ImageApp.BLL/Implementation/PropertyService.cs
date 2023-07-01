@@ -25,26 +25,25 @@ namespace ImageApp.BLL.Implementation
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<(bool successful, string msg)> AddOrUpdateAsync(string userId, string pictureId, AllPicturesVM allPicturesVM)
+        public async Task<(bool successful, string msg)> AddOrUpdateAsync(PictureVM model)
         {
-            User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
+            User? user = await _userRepo.GetSingleByAsync(u => u.Id == model.UserId, include: u => u.Include(x => x.Pictures), tracking: true);
             if (user == null)
             {
-                return (false, $"User with id:{userId} wasn't found");
+                return (false, $"User with id:{user.UserName} wasn't found");
             }
 
-            Picture? picture = user.Pictures?.SingleOrDefault(t => t.Id == pictureId);
+            Picture? picture = user.Pictures?.SingleOrDefault(t => t.Id == model.PictureId);
             if (picture != null)
             {
-                var update = _mapper.Map(allPicturesVM, picture);
-                await _pictureRepo.AddAsync(update);
+                var update = _mapper.Map(model, picture);
+                await _pictureRepo.UpdateAsync(update);
                 return (true, "Updated Successfully!");
             }
 
-            var newpic = _mapper.Map<Picture>(allPicturesVM);
-            user.Pictures?.Add(newpic);
+            var newpic = _mapper.Map<Picture>(model);
 
-            var rowChanges = await _userRepo.AddAsync(user);
+            var rowChanges = await _pictureRepo.AddAsync(newpic);
             return rowChanges != null ? (true, $"Picture uccessfully created!") : (false, "Failed To Create picture!");
         }
 
@@ -84,7 +83,7 @@ namespace ImageApp.BLL.Implementation
                 {
                     PictureVM UaP = new PictureVM
                     {
-                        Id = picture.Id,
+                        PictureId = picture.Id,
                         Name = picture.Name,
                         ImageFile = picture.ImageFile,
                         Description = picture.Description,
@@ -102,7 +101,7 @@ namespace ImageApp.BLL.Implementation
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
             var UwT = user?.Pictures?.Select(t => new PictureVM
             {
-                Id = t.Id,
+				PictureId = t.Id,
                 Name = t.Name,
                 Description = t.Description,
                 ImageFile = t.ImageFile,

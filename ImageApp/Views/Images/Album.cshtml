@@ -35,9 +35,9 @@
                                 <h4>@item.value.Name</h4>
                             <p>App</p>
                             <div class="portfolio-links">
-                                <a href="~/img/portfolio/@item.value.ImageFile" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@item.value.Name"><i class="bx bx-plus"></i></a>
-                                <a asp-controller="Images" asp-action="GetPicture" asp-route-pictureId="@item.value.Id" asp-route-userId ="@item.value.UserId" class="portfolio-details-lightbox" data-glightbox="type: external" title="Portfolio Details"><i class="bx bx-link"></i></a>
-                                    <a class="nav-link" asp-controller="Images" asp-action="NewImage" asp-route-PictureId="">New Image</a>
+                                <a href="~/img/portfolio/@item.value.ImageFile" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@item.value.Name"><i class="fa-solid fa-up-right-and-down-left-from-center fa-sm mx-1"></i></a>
+                                <a asp-controller="Images" asp-action="GetPicture" asp-route-pictureId="@item.value.PictureId" asp-route-userId="@item.value.UserId" class="portfolio-details-lightbox" data-glightbox="type: external" title="Details"><i class="fa-solid fa-circle-info fa-sm"></i></a>
+                                <a  asp-controller="Images" asp-action="UpdateImage" asp-route-PictureId="@item.value.PictureId"><i class="fa-solid fa-pen-to-square fa-sm"></i></a>
                             </div>
                         </div>
                     </div>

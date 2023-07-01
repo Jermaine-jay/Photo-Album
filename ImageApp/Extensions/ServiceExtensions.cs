@@ -8,7 +8,6 @@ namespace ImageApp.Extensions
 {
     public static class ServiceExtensions
     {
-        private static readonly IConfiguration configuration;
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddScoped<IUploadImageService, UploadImageService>();

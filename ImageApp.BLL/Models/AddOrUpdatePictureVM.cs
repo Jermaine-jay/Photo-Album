@@ -5,8 +5,8 @@ namespace ImageApp.BLL.Models
 {
     public class AddOrUpdatePictureVM
     {
-		public string UserId { get; set; }
-		public string PictureId { get; set; }
+		public string? UserId { get; set; }
+		public string? PictureId { get; set; }
 
         [Required]
         public string Name { get; set; }

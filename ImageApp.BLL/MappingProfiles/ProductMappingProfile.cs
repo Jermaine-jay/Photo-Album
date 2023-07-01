@@ -10,7 +10,12 @@ namespace ImageApp.BLL.MappingProfiles
         {
             CreateMap<AddOrUpdatePictureVM, Picture>();
             CreateMap<Picture, AddOrUpdatePictureVM>();
+
             CreateMap<AllPicturesVM, Picture>();
+            CreateMap<Picture, AllPicturesVM>();
+
+            CreateMap<PictureVM, Picture>();
+            CreateMap<Picture, PictureVM>();
         }
     }
 }

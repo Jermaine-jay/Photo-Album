@@ -39,7 +39,6 @@
         @foreach (var picture in item.value.Pictures.Select((value, i) => new { value, i }))
         {
             <tbody>
-
                 <tr>
                     <th scope="row">@(item.i + 1)</th>
                     <td>@picture.value.Name</td>
@@ -52,7 +51,6 @@
                                 <i class="fa-solid fa-pen fa-lg"></i>
                             </a>
                         </span>
-
                         <span class="px-1">                        
                             <a asp-action="DeleteImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
                                 <i class="fa-solid fa-trash fa-lg"></i>

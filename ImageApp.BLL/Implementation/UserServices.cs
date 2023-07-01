@@ -197,7 +197,7 @@ namespace ImageApp.BLL.Implementation
 				Id = u.Id,
 				UserName = u.UserName,
 				Email = u.Email,
-				DateOfBirth = u.DateOfBirth.ToString("d"),
+				DateOfBirth = u.DateOfBirth.ToString("dd MMMM yyyy"),
 				Gender = u.Gender.ToString(),
 				Age = u.Age,
 				PhoneNumber = u.PhoneNumber,

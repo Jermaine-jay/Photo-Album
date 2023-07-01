@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ImageApp.BLL.Interface;
+﻿using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
@@ -10,20 +9,19 @@ namespace ImageApp.BLL.Implementation
 {
 	public class UploadImageService : IUploadImageService
 	{
-		private readonly IMapper _mapper;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IRepository<Picture> _productRepo;
 		private readonly IRepository<User> _userRepo;
 		private readonly IWebHostEnvironment _webHostEnvironment;
 		private readonly IPropertyService _propertyService;
 
-		public UploadImageService(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
+		public UploadImageService(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, IPropertyService propertyService)
 		{
-			_mapper = mapper;
 			_unitOfWork = unitOfWork;
 			_productRepo = _unitOfWork.GetRepository<Picture>();
-            _userRepo = _unitOfWork.GetRepository<User>();
+			_userRepo = _unitOfWork.GetRepository<User>();
 			_webHostEnvironment = webHostEnvironment;
+			_propertyService = propertyService;
 		}
 
 
@@ -42,21 +40,46 @@ namespace ImageApp.BLL.Implementation
 				await model.ImageFile.CopyToAsync(stream);
 			}
 
-			AllPicturesVM img = new()
+            PictureVM img = new()
 			{
 				ImageFile = fileName,
 				Name = model.Name,
 				Description = model.Description,
+				UserId = model.UserId,
+				PictureId = model.PictureId
 			};
 
-			var result = await _propertyService?.AddOrUpdateAsync(model.UserId, model.PictureId, img);
+			var result = await _propertyService?.AddOrUpdateAsync(img);
 			return result;
 		}
 
-		public async Task<IEnumerable<UserWithPicturesVM>> GetImages()
+        public async Task<(bool successful, string msg)> UpdateImage(PictureVM model)
+		{
+            User? user = await _userRepo.GetSingleByAsync(u => u.Id == model.UserId);
+            if (user == null)
+            {
+                return (false, $"User with id:{user.UserName} wasn't found");
+            }
+
+			/* PictureVM img = new()
+			{
+				ImageFile = model.ImageFile,
+				Name = model.Name,
+				Description = model.Description,
+				UserId = model.UserId,
+				PictureId = model.PictureId
+			};*/
+
+
+            var result = await _propertyService?.AddOrUpdateAsync(model);
+			return result;
+        }
+
+
+        public async Task<IEnumerable<UserWithPicturesVM>> GetImages()
 		{
 			var user = await _userRepo.GetAllAsync(include: u => u.Include(x => x.Pictures));
-			return	user.Select(u => new UserWithPicturesVM
+			return user.Select(u => new UserWithPicturesVM
 			{
 				Id = u.Id,
 				UserName = u.UserName,

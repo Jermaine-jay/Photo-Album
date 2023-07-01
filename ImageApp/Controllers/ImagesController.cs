@@ -5,44 +5,47 @@ using System.Security.Claims;
 
 namespace ImageApp.Controllers
 {
-	//[AutoValidateAntiforgeryToken]
-	[Route("[controller]/[action]/{id?}")]
-	public class ImagesController : Controller
-	{
-		private readonly IUploadImageService _UploadImage;
-		private readonly IPropertyService _propertyService;
+    //[AutoValidateAntiforgeryToken]
+    [Route("[controller]/[action]/{id?}")]
+    public class ImagesController : Controller
+    {
+        private readonly IUploadImageService _UploadImage;
+        private readonly IPropertyService _propertyService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public ImagesController(IUploadImageService uploadImage, IHttpContextAccessor httpContextAccessor, IPropertyService propertyService )
-		{
-			_UploadImage = uploadImage;
-			_httpContextAccessor = httpContextAccessor;
-			_propertyService = propertyService;
-		}
-		public IActionResult Home()
-		{
-			return View();
-		}
-		public async Task<IActionResult> Album()
-		{
+        public ImagesController(IUploadImageService uploadImage, IHttpContextAccessor httpContextAccessor, IPropertyService propertyService)
+        {
+            _UploadImage = uploadImage;
+            _httpContextAccessor = httpContextAccessor;
+            _propertyService = propertyService;
+        }
+        public IActionResult Home()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Album()
+        {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var model = await _propertyService.GetUserWithPicturesAsync(userId);
+            var model = await _propertyService.GetUserWithPicturesAsync(userId);
             return View(model);
-		}
+        }
 
-		/*[Authorize(Roles = Roles.User)]*/
-		[HttpGet("{pictureId?}")]
-		public async Task<IActionResult> NewImage(string? pictureId)
-		{
-			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if(pictureId == null)
-			{
-				return View(new AddOrUpdatePictureVM { UserId = userId});
+        /*[Authorize(Roles = Roles.User)]*/
+        public async Task<IActionResult> NewImage()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-			}
-			return View(new AddOrUpdatePictureVM { UserId = userId, PictureId = pictureId });
-		}
+            return View(new AddOrUpdatePictureVM { UserId = userId });
+        }
 
-		[HttpGet]
+        //[HttpGet("{pictureId?}")]
+        public async Task<IActionResult> UpdateImage(string? pictureId)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var picture = await _propertyService.GetPicture(userId, pictureId);
+            return View(picture);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetPicture(string pictureId)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -52,30 +55,48 @@ namespace ImageApp.Controllers
 
         /*[Authorize(Roles = Roles.User)]*/
         public async Task<IActionResult> AllImages()
-		{
-			var model = await _UploadImage.GetImages();
-			return View(model);
-		}
+        {
+            var model = await _UploadImage.GetImages();
+            return View(model);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
-		{
-			if (ModelState.IsValid)
-			{
-				var (successful, msg) = await _UploadImage.AddImage(model);
+        [HttpPost]
+        public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var (successful, msg) = await _UploadImage.AddImage(model);
 
-				if (successful)
-				{
-					TempData["SuccessMsg"] = msg;
-					return RedirectToAction("AllImages");
-				}
-				TempData["ErrMsg"] = msg;
-				return View("NewImage");
-			}
-			return View("NewImage");
-		}
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("Album");
+                }
+                TempData["ErrMsg"] = msg;
+                return View("NewImage");
+            }
+            return View("NewImage");
+        }
 
-		[HttpGet]
+        [HttpPost]
+        public async Task<IActionResult> SaveUpdate(PictureVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var (successful, msg) = await _UploadImage.UpdateImage(model);
+
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("Album");
+                }
+                TempData["ErrMsg"] = msg;
+                return View("UpdateImage");
+            }
+            return View("UpdateImage");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> DeleteImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
