@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace ImageApp.Controllers
 {
-    //[AutoValidateAntiforgeryToken]
+    [AutoValidateAntiforgeryToken]
     [Route("[controller]/[action]/{id?}")]
     public class ImagesController : Controller
     {
@@ -22,6 +22,7 @@ namespace ImageApp.Controllers
         {
             return View();
         }
+
         public async Task<IActionResult> Album()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -84,7 +85,6 @@ namespace ImageApp.Controllers
             if (ModelState.IsValid)
             {
                 var (successful, msg) = await _UploadImage.UpdateImage(model);
-
                 if (successful)
                 {
                     TempData["SuccessMsg"] = msg;
@@ -103,7 +103,6 @@ namespace ImageApp.Controllers
             if (ModelState.IsValid)
             {
                 var (successful, msg) = await _propertyService.DeletePictureAsync(userId, pictureId);
-
                 if (successful)
                 {
                     TempData["SuccessMsg"] = msg;

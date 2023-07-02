@@ -53,6 +53,7 @@ namespace ImageApp.BLL.Implementation
 			return result;
 		}
 
+
         public async Task<(bool successful, string msg)> UpdateImage(PictureVM model)
 		{
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == model.UserId);
@@ -60,16 +61,6 @@ namespace ImageApp.BLL.Implementation
             {
                 return (false, $"User with id:{user.UserName} wasn't found");
             }
-
-			/* PictureVM img = new()
-			{
-				ImageFile = model.ImageFile,
-				Name = model.Name,
-				Description = model.Description,
-				UserId = model.UserId,
-				PictureId = model.PictureId
-			};*/
-
 
             var result = await _propertyService?.AddOrUpdateAsync(model);
 			return result;
