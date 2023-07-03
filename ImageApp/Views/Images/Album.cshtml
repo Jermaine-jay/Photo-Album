@@ -16,11 +16,8 @@
 
         <div class="row">
             <div class="col-lg-12 d-flex justify-content-center">
-                <ul class="portfolio-flters">
-                    
-                    <li class="filter-active"><a asp-controller="Images" asp-action="NewImage" asp-route-PictureId="" style="text-decoration:none">New Image</a></li>
-                    <li>Card</li>
-                    <li>Web</li>
+                <ul class="portfolio-flters">             
+                    <li class="filter-active"><a asp-controller="Images" asp-action="NewImage" asp-route-PictureId="" style="text-decoration:none; color:whitesmoke;">New Image</a></li>
                 </ul>
             </div>
         </div>
@@ -28,20 +25,23 @@
         <div class="row portfolio-container shadow-lg pt-4 bg-white rounded w-100 " data-aos="fade-up" data-aos-delay="200">         
             @foreach (var item in Model.Select((value, i) => new { value, i }))
             {
-                <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-                    <div class="portfolio-wrap">
+                    @if (item.value.ImageFile.Count() != 0)
+                    {
+                        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+                            <div class="portfolio-wrap">
                         <img src="~/img/portfolio/@item.value.ImageFile" class="img-fluid" alt="">
                         <div class="portfolio-info">
-                                <h4>@item.value.Name</h4>
-                            <p>App</p>
+                            <h4>@item.value.Name</h4>
                             <div class="portfolio-links">
                                 <a href="~/img/portfolio/@item.value.ImageFile" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@item.value.Name"><i class="fa-solid fa-up-right-and-down-left-from-center fa-sm mx-1"></i></a>
                                 <a asp-controller="Images" asp-action="GetPicture" asp-route-pictureId="@item.value.PictureId" asp-route-userId="@item.value.UserId" class="portfolio-details-lightbox" data-glightbox="type: external" title="Details"><i class="fa-solid fa-circle-info fa-sm"></i></a>
                                 <a  asp-controller="Images" asp-action="UpdateImage" asp-route-PictureId="@item.value.PictureId"><i class="fa-solid fa-pen-to-square fa-sm"></i></a>
+                                <a  asp-controller="Images" asp-action="DeleteImage" asp-route-PictureId="@item.value.PictureId"><i class="fa-solid fa-trash fa-sm"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
+                }
             }
         </div>
     </div>

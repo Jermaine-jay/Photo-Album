@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿﻿@using ImageApp.DAL.Entities;
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc;
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -31,49 +38,35 @@
 
             <nav id="navbar" class="navbar">
                 <ul>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="AllImages">Images</a>
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="NewImage">New Image</a>
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="Album">Album</a>
-                    </li>
+                     @if (User.Identity.IsAuthenticated)
+                    {
 
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="RegisterUser">RegisterUser</a>
-                    </li>
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+               
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="AllUsers">AllUsers</a></li>                          
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="AllImages">Images</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="RegisterAdmin">RegisterAdmin</a></li>
+                        }
 
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="RegisterAdmin">RegisterAdmin</a>
-                    </li>
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile">Profile</a></li>
 
-                    <li >
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignIn">Login</a>
-                    </li>
+                        @if (User.IsInRole("User"))
+                        {
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="UpdateUser">Update</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="NewImage">New Image</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="Album">Album</a></li>
+                        }
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignOut">logout</a></li>
+                    }
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="RegisterUser">Register</a></li>
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignIn">Login</a></li>
 
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignOut">logout</a>
-                    </li>
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile">Profile</a>
-                    </li>
-
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="UpdateUser">Update</a>
-                    </li>
-
-                    <li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="AllUsers">AllUsers</a>
-                    </li>
+                    }
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav>
@@ -90,12 +83,6 @@
     </header>
             @RenderBody()
     
-
-    @*<footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - ImageApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>*@
 
     <script src="~/vendor/purecounter/purecounter_vanilla.js" asp-append-version="true"> </script>
     <script src="~/vendor/aos/aos.js" asp-append-version="true"></script>

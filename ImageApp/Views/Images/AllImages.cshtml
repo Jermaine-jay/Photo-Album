@@ -25,44 +25,47 @@
 
 @foreach (var item in Model.Select((value, i) => new { value, i }))
 {
-        <h1>@item.value.UserName</h1>
-    <table class="table">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">ImageFile</th>
-                
-            </tr>
-        </thead>
-
-        @foreach (var picture in item.value.Pictures.Select((value, i) => new { value, i }))
-        {
-            <tbody>
+    @if (item.value.Pictures.Count() != 0)
+    {
+            <h1>@item.value.UserName</h1>
+        <table class="table">
+            <thead class="thead-dark">
                 <tr>
-                    <th scope="row">@(item.i + 1)</th>
-                    <td>@picture.value.Name</td>
-                    <td>@picture.value.Id</td>
-                    <td>@picture.value.User</td>
-                    <td class="d-flex">
-
-                        <span class="px-1">
-                            <a asp-action="NewImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
-                                <i class="fa-solid fa-pen fa-lg"></i>
-                            </a>
-                        </span>
-                        <span class="px-1">                        
-                            <a asp-action="DeleteImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
-                                <i class="fa-solid fa-trash fa-lg"></i>
-                            </a>
-                        </span>
-                    </td>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">ImageFile</th>           
                 </tr>
+            </thead>
 
-            </tbody>
-        }
-    </table>
+            @foreach (var picture in item.value.Pictures.Select((value, i) => new { value, i }))
+            {
+                          
+                <tbody>
+                    <tr>
+                        <th scope="row">@(item.i + 1)</th>
+                        <td>@picture.value.Name</td>
+                        <td>@picture.value.Id</td>
+                        <td>@picture.value.User</td>
+                        <td class="d-flex">
+
+                            <span class="px-1">
+                                <a asp-action="NewImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
+                                    <i class="fa-solid fa-pen fa-lg" style="color:green"></i>
+                                </a>
+                            </span>
+                            <span class="px-1">
+                                    <a asp-action="DeleteUserImage" asp-controller="Images" asp-route-PictureId="@item.value.Id">
+                                    <i class="fa-solid fa-trash fa-lg" style="color:red;"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            
+            }
+        </table>
     }
+ }
 </section>
 
 @section Scripts

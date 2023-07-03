@@ -28,6 +28,7 @@ namespace ImageApp.BLL.Implementation
                           border: 1px solid #ccc;
                           padding: 30px;
                           height: auto;
+                          border: 1px solid #4CAF50;
                         }}
 
                         h1 {{
@@ -49,7 +50,7 @@ namespace ImageApp.BLL.Implementation
                             padding: 10px 20px;
                             font-size: 14px;
                             position: relative;
-                            border: 1px solid;
+                            border: 1px solid #4CAF50;
                             transition: transform 0.2s ease-in;
                             cursor: pointer;
   
@@ -102,6 +103,7 @@ namespace ImageApp.BLL.Implementation
                           border: 1px solid #ccc;
                           padding: 30px;
                           height: auto;
+                          border: 1px solid #4CAF50;
                         }}
 
                         h1 {{
@@ -123,7 +125,7 @@ namespace ImageApp.BLL.Implementation
                             padding: 10px 20px;
                             font-size: 14px;
                             position: relative;
-                            border: 1px solid;
+                            border: 1px solid #4CAF50;
                             transition: transform 0.2s ease-in;
                             cursor: pointer;
   

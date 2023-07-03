@@ -69,7 +69,7 @@ namespace ImageApp.BLL.Implementation
             var filePathToDelete = Path.Combine(_webHostEnvironment.WebRootPath, "img", "portfolio", fileName);
             if (picture == null || File.Exists(filePathToDelete))
             {
-                return (false, $"Aunction with user:{picture?.Id} wasn't found");
+                return (false, $"Aunction with user:{picture?.Name} wasn't found");
             }
 
             File.Delete(filePathToDelete);

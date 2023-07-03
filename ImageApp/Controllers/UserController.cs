@@ -28,6 +28,7 @@ namespace ImageApp.Controllers
         {
             return View();
         }
+
         public IActionResult ForgotPassword()
         {
             return View(new ForgotPasswordVM());

@@ -57,14 +57,14 @@
 
 			<div class="form-row">
 				<label asp-for="@Model.DateOfBirth" class="form-label"></label>
-				<input type="date" class="input-text" asp-for="@Model.DateOfBirth" required />
+					<input type="date" class="input-text" asp-for="@Model.DateOfBirth" style="color:#bc6c25;"  required />
 				<span asp-validation-for="@Model.DateOfBirth" style="color: red;"></span>
 			</div>
 
 			<div class="form-row">
 				<label asp-for="@Model.Gender" class="form-label"></label>
-				<select class="form-select" style="width:94.5%" aria-label="Default select example" asp-for="@Model.Gender" asp-items="Html.GetEnumSelectList <Gender>()">
-					<option selected="" ></option>
+					<select class="form-select" style="width:94.5%; color:#bc6c25;" aria-label="Default select example" asp-for="@Model.Gender" asp-items="Html.GetEnumSelectList <Gender>()">
+					<option selected="" style="color:#bc6c25;"></option>
 				</select>
 			</div>
 
@@ -81,6 +81,7 @@
 				<span asp-validation-for="@Model.ConfirmPassword" style="color: red;"></span>
 				<i class="fas fa-lock p-2"></i>
 			</div>
+
 			<div class="form-row-last">
 				<input type="submit" name="register" class="register" value="Register">
 			</div>

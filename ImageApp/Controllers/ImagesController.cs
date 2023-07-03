@@ -38,7 +38,7 @@ namespace ImageApp.Controllers
             return View(new AddOrUpdatePictureVM { UserId = userId });
         }
 
-        //[HttpGet("{pictureId?}")]
+        
         public async Task<IActionResult> UpdateImage(string? pictureId)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -106,6 +106,25 @@ namespace ImageApp.Controllers
                 if (successful)
                 {
                     TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("Album");
+                }
+                TempData["ErrMsg"] = msg;
+                return View("Album");
+            }
+            return View("Album");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteUserImage(string pictureId)
+        {
+            string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (ModelState.IsValid)
+            {
+                var (successful, msg) = await _propertyService.DeletePictureAsync(userId, pictureId);
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
                     return RedirectToAction("AllImages");
                 }
                 TempData["ErrMsg"] = msg;
@@ -113,6 +132,5 @@ namespace ImageApp.Controllers
             }
             return View("NewImage");
         }
-
     }
 }
