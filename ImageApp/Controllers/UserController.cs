@@ -1,7 +1,9 @@
 ﻿using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using System.Data;
 using System.Security.Claims;
 
 namespace ImageApp.Controllers
@@ -24,26 +26,34 @@ namespace ImageApp.Controllers
             _authenticationService = authenticationService;
             _recoveryService = recoveryService;
         }
+
         public IActionResult WaitingPage()
         {
             return View();
         }
 
-        public IActionResult ForgotPassword()
+		[Authorize]
+		public IActionResult ForgotPassword()
         {
             return View(new ForgotPasswordVM());
         }
 
-        public IActionResult RegisterUser()
+
+		[Authorize(Roles = "User")]
+		public IActionResult RegisterUser()
         {
             return View(new RegisterVM());
         }
 
-        public IActionResult RegisterAdmin()
+
+		[Authorize(Roles = "Admin")]
+		public IActionResult RegisterAdmin()
         {
             return View(new RegisterVM());
         }
 
+
+        [Authorize]
         public async Task<IActionResult> Profile()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -55,12 +65,16 @@ namespace ImageApp.Controllers
             return View(user);
         }
 
-        public async Task<IActionResult> AllUsers()
+
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> AllUsers()
         {
             var model = await _userServices.GetUsers();
             return View(model);
         }
 
+
+        [Authorize]
         public async Task<IActionResult> UpdateUser(string? Id)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -75,10 +89,12 @@ namespace ImageApp.Controllers
             /*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
         }
 
+
         public IActionResult SignIn()
         {
             return View(new SignInVM());
         }
+
 
         public IActionResult ResetPassword(string? code, string userId)
         {
@@ -89,6 +105,7 @@ namespace ImageApp.Controllers
             var model = new ResetPasswordVM { Code = code, UserId = userId };
             return View(model);
         }
+
 
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
@@ -101,6 +118,7 @@ namespace ImageApp.Controllers
             TempData["ErrMsg"] = msg;
             return View("SignIn");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SaveUser(RegisterVM model)
@@ -172,6 +190,8 @@ namespace ImageApp.Controllers
             return View("signIn");
         }
 
+
+        [Authorize]
         public async Task<IActionResult> SignOut()
         {
             if (ModelState.IsValid)
@@ -204,6 +224,7 @@ namespace ImageApp.Controllers
             }
             return View("AllUsers");
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

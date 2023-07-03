@@ -1,5 +1,6 @@
 ﻿using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -12,57 +13,68 @@ namespace ImageApp.Controllers
         private readonly IUploadImageService _UploadImage;
         private readonly IPropertyService _propertyService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         public ImagesController(IUploadImageService uploadImage, IHttpContextAccessor httpContextAccessor, IPropertyService propertyService)
         {
             _UploadImage = uploadImage;
             _httpContextAccessor = httpContextAccessor;
             _propertyService = propertyService;
         }
+
+
         public IActionResult Home()
         {
             return View();
         }
 
-        public async Task<IActionResult> Album()
+
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> Album()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var model = await _propertyService.GetUserWithPicturesAsync(userId);
             return View(model);
         }
 
-        /*[Authorize(Roles = Roles.User)]*/
+
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> NewImage()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             return View(new AddOrUpdatePictureVM { UserId = userId });
         }
 
-        
-        public async Task<IActionResult> UpdateImage(string? pictureId)
+
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> UpdateImage(string? pictureId)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var picture = await _propertyService.GetPicture(userId, pictureId);
             return View(picture);
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> GetPicture(string pictureId)
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> GetPicture(string pictureId)
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var model = await _propertyService.GetPicture(userId, pictureId);
             return View(model);
         }
 
-        /*[Authorize(Roles = Roles.User)]*/
-        public async Task<IActionResult> AllImages()
+
+		[Authorize]
+		public async Task<IActionResult> AllImages()
         {
             var model = await _UploadImage.GetImages();
             return View(model);
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> Save(AddOrUpdatePictureVM model)
         {
             if (ModelState.IsValid)
             {
@@ -79,8 +91,10 @@ namespace ImageApp.Controllers
             return View("NewImage");
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> SaveUpdate(PictureVM model)
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> SaveUpdate(PictureVM model)
         {
             if (ModelState.IsValid)
             {
@@ -96,8 +110,10 @@ namespace ImageApp.Controllers
             return View("UpdateImage");
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> DeleteImage(string pictureId)
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> DeleteImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
@@ -116,7 +132,8 @@ namespace ImageApp.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> DeleteUserImage(string pictureId)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> DeleteUserImage(string pictureId)
         {
             string? userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
