@@ -3,24 +3,36 @@
 	Layout = "_Layout";
 }
 
-<section class="waiting">
-	<div class="page-content shadow-sm p-3 mb-5 bg-white rounded w-50">
-		@if (@TempData["SuccessMsg"] != null)
-		{
-			<div class="fade show w-55 mx-auto d-block" role="alert">
-				<h3><strong>Success!</strong> @TempData["SuccessMsg"]</h3>
-			</div>
-		}
 
+<section class="container text-center " style="display: flex; justify-content: center; margin: 150px auto;">
+	<div>
+		<div class="card shadow p-3 mb-5 bg-body-tertiary rounded" style="width: 500px;">
+			@if (@TempData["SuccessMsg"] != null)
+			{
 
-		@if (@TempData["ErrMsg"] != null)
-		{
-			<div class=" w-55 mx-auto d-block" role="alert">
-				<h3><strong>Error!</strong> @TempData["ErrMsg"]</h3>		
-			</div>
-		}
+				<div class="card-body">
 
-	<h2>Witing page</h2>
+					<h2>Success!!</h2>
+					<p>@TempData["SuccessMsg"]</p>
+					<p>Check your Email and click the link to confirm your email</p>
+					<p></p>
+					
+				</div>
+			}
+
+			@if (@TempData["ErrMsg"] != null)
+			{
+				<div class="card-body">
+
+					<h2>Failed!!</h2>
+					<p>@TempData["ErrMsg"]</p>
+					<p>Failed to send verification mail</p>
+					<p></p>
+
+				</div>		
+			}
+		</div>
+		<a asp-controller="User" asp-action="SignIn" tabindex="-1" role="button" aria-disabled="true" style="color:green">Back to Login</a>
 	</div>
 </section>
 @section Scripts

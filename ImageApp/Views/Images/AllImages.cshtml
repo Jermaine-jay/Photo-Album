@@ -27,7 +27,7 @@
 {
     @if (item.value.Pictures.Count() != 0)
     {
-            <h1>@item.value.UserName</h1>
+        <h1>@item.value.UserName</h1>
         <table class="table">
             <thead class="thead-dark">
                 <tr>
@@ -38,8 +38,7 @@
             </thead>
 
             @foreach (var picture in item.value.Pictures.Select((value, i) => new { value, i }))
-            {
-                          
+            {                        
                 <tbody>
                     <tr>
                         <th scope="row">@(item.i + 1)</th>
@@ -60,8 +59,7 @@
                             </span>
                         </td>
                     </tr>
-                </tbody>
-            
+                </tbody>         
             }
         </table>
     }

@@ -29,6 +29,7 @@ namespace ImageApp.BLL.Implementation
             throw new NotImplementedException();
         }
 
+
         public async Task<(bool successful, string msg)> ForgotPassword(IUrlHelper urlHelper, ForgotPasswordVM model)
         {
             var verify = await _authenticationService.VerifyEmail(model.Email);
@@ -49,10 +50,12 @@ namespace ImageApp.BLL.Implementation
             return (true, "Reset Password Email Sent");
         }
 
+
         public Task<(bool successful, string msg)> ResetEmail(string userId, string code)
         {
             throw new NotImplementedException();
         }
+
 
         public async Task<(bool successful, string msg)> ResetPassword(ResetPasswordVM model)
         {

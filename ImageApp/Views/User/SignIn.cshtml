@@ -31,7 +31,7 @@
 			<div class="alert-danger" asp-validation-summary="@ValidationSummary.All"></div>
 			<h2>Sign In</h2>
 			<div class="form-row">
-				<label asp-for="@Model.UsernameOrEmail" class="form-label"></label>
+				<label class="form-label">Username or Email</label>
 				<input type="text" class="input-text" asp-for="@Model.UsernameOrEmail" required />
 				<span asp-validation-for="@Model.UsernameOrEmail"></span>
 				<i class="fas fa-user p-2" style="color:#bc6c25;"></i>
@@ -39,7 +39,7 @@
 			
 			<div class="form-row">
 				<label asp-for="@Model.Password" class="form-label"></label>
-				<input type="text" class="input-text" asp-for="@Model.Password" required />
+				<input type="password" class="input-text" asp-for="@Model.Password" required />
 				<span asp-validation-for="@Model.Password"></span>
 				<i class="fas fa-lock p-2" style="color:#bc6c25;"></i>
 			</div>
