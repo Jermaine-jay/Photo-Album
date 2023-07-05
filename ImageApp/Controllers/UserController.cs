@@ -84,8 +84,6 @@ namespace ImageApp.Controllers
 			}
 			var user = await _userServices.GetUser(Id);
 			return View(userId);
-
-			/*_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name));*/
 		}
 
 
