@@ -31,11 +31,13 @@ namespace ImageApp.Controllers
 			return View();
 		}
 
+
 		[Authorize]
 		public IActionResult ForgotPassword()
 		{
 			return View(new ForgotPasswordVM());
 		}
+
 
 
 		[Authorize(Roles = "User")]
@@ -117,7 +119,8 @@ namespace ImageApp.Controllers
 		}
 
 
-		[HttpPost]
+
+        [HttpPost]
 		public async Task<IActionResult> SaveUser(RegisterVM model)
 		{
 			if (ModelState.IsValid)
@@ -134,6 +137,7 @@ namespace ImageApp.Controllers
 			}
 			return View("RegisterUser");
 		}
+
 
 		[HttpPost]
 		public async Task<IActionResult> SaveAdmin(RegisterVM model)
@@ -152,6 +156,7 @@ namespace ImageApp.Controllers
 			}
 			return View("RegisterAdmin");
 		}
+
 
 		[HttpPost]
 		public async Task<IActionResult> SaveUpdate(UserVM model)
@@ -225,6 +230,7 @@ namespace ImageApp.Controllers
 		}
 
 
+
 		[HttpPost]
 		[Authorize]
 		public async Task<IActionResult> DeleteMyAccount(string userId)
@@ -244,6 +250,7 @@ namespace ImageApp.Controllers
 		}
 
 
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ResetUserPassword(ResetPasswordVM model)
@@ -261,6 +268,8 @@ namespace ImageApp.Controllers
 			}
 			return View("ResetPassword");
 		}
+
+
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
@@ -282,5 +291,81 @@ namespace ImageApp.Controllers
 			return View("WaitingPage");
 
 		}
+
+
+
+        public async Task<ActionResult> ChangePassword()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return View(new ChangePasswordVM { UserId = userId });
+        }
+
+
+        public async Task<IActionResult> ConfirmToken()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return View(new ConfirmTokenVM { UserId = userId });
+        }
+
+
+		//[Authorize]
+		public async Task<IActionResult> UserChangePassword()
+		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
+			var (successful, msg) = await _recoveryService.ChangePasswordToken(urlHelper, userId);
+			if (successful)
+			{
+				TempData["SuccessMsg"] = msg;
+				return RedirectToAction("ConfirmToken");
+			}
+			TempData["ErrMsg"] = msg;
+			return View("WaitingPage");
+		}
+
+
+
+		[HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmUserToken(ConfirmTokenVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var (successful, msg) = await _recoveryService.VerifyChangePasswordToken(model);
+
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("ChangePassword");
+                }
+                TempData["ErrMsg"] = msg;
+                return View("ConfirmToken");
+            }
+            return View("ConfirmToken");
+
+        }
+
+
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ChangeUserPassword(ChangePasswordVM model)
+		{
+			if (ModelState.IsValid)
+			{
+				var (successful, msg) = await _recoveryService.ChangePassword(model);
+
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("Profile");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("Confirm");
+			}
+			return View("WaitingPage");
+
+		}
+
 	}
 }

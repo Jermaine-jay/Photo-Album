@@ -4,5 +4,7 @@
 	{
 		public string EmailVerificationPage(string name, string callbackurl);
 		public string PasswordResetPage(string callbackurl);
-	}
+		public string ChangePasswordPage(string code);
+
+    }
 }

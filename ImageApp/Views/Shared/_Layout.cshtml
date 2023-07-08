@@ -59,6 +59,7 @@
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Images" asp-action="Album">Album</a></li>
                         }
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="SignOut">logout</a></li>
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="UserChangePassword">change password</a></li>
                     }
                     @if (!User.Identity.IsAuthenticated)
                     {

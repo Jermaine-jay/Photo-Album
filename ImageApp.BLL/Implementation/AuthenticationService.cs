@@ -48,6 +48,8 @@ namespace ImageApp.BLL.Implementation
             }
             return (false, "Invalid Verification Code");
         }
+
+
         public async Task<(bool successful, string msg)> SendEmailAsync(string email, string subject, string message)
         {
             if (string.IsNullOrEmpty(_emailSenderOptions.Password))
@@ -57,6 +59,8 @@ namespace ImageApp.BLL.Implementation
             await Execute(email, subject, message);
             return (true, "Verification Mail sent to your Email Address");
         }
+
+
         public async Task<bool> Execute(string email, string subject, string htmlMessage)
         {
             var message = new MimeMessage();
@@ -80,6 +84,8 @@ namespace ImageApp.BLL.Implementation
 
             return true;
         }
+
+
         public async Task<bool> VerifyEmail(string emailAddress)
         {
             try
@@ -105,6 +111,7 @@ namespace ImageApp.BLL.Implementation
                 return false;
             }
         }
+
 
         public async Task<bool> RegistrationMail(IUrlHelper urlHelper, User newUser)
         {

@@ -84,6 +84,7 @@ namespace ImageApp.BLL.Implementation
             return (false, $"Failed to create User");
 		}
 
+
 		public async Task<(bool successful, string msg)> SignIn(SignInVM signIn)
 		{
 			User user;
@@ -103,6 +104,7 @@ namespace ImageApp.BLL.Implementation
 			}
 			return (false, "User does not exist");
 		}
+
 
 		public async Task<(bool successful, string msg)> SignOut()
 		{
@@ -205,5 +207,7 @@ namespace ImageApp.BLL.Implementation
 			});
 			return userViewModels;
 		}
-	}
+
+        
+    }
 }

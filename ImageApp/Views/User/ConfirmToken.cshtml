@@ -3,8 +3,8 @@
 	Layout = "_Layout";
 }
 
-@using ImageApp.DAL.Enums
-@model ImageApp.BLL.Models.RegisterVM;
+
+@model ImageApp.BLL.Models.ConfirmTokenVM;
 
 <section class="mt-4">
 	@if (@TempData["SuccessMsg"] != null)
@@ -25,22 +25,28 @@
 	}
 
 	<div class="page-content">
-		<div class="form-v5-content w">
-			<form class="form-detail" id="myForm" asp-controller="User" asp-action="SaveUser">
+		<div class="form-v5-content">
+			<form class="form-detail" id="myForm" asp-controller="User" asp-action="ConfirmUserToken">
 
 				<div class="alert-danger" asp-validation-summary="@ValidationSummary.ModelOnly"></div>
-				<h2>Confirm Account</h2>
-			
+				<h2>Verify Token</h2>
+
 				<div class="form-row">
-					<label asp-for="@Model.Password" class="form-label"></label>
-					<input type="text" class="input-text" style="align-items:center" asp-for="@Model.Password" required />
-					<span asp-validation-for="@Model.Password" style="color: red;"></span>
+					<label asp-for="@Model.UserId" class="form-label"></label>
+					<input type="text" class="input-text" style="align-items:center" asp-for="@Model.UserId" required />
+					<span asp-validation-for="@Model.UserId" style="color: red;"></span>
 				</div>
 
-			
-				<div class="form-row" style="color:green">
-					<input type="submit" name="register" class="input-text w-50" value="Register">
+				<div class="form-row">
+					<label asp-for="@Model.Token" class="form-label"></label>
+					<input type="text" class="input-text" style="align-items:center" asp-for="@Model.Token" required />
+					<span asp-validation-for="@Model.Token" style="color: red;"></span>
 				</div>
+
+				<div class="form-row-last">
+					<input type="submit" name="register" class="register" value="Verify">
+				</div>
+
 			</form>
 		</div>
 	</div>

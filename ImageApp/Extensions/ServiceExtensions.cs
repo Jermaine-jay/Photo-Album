@@ -1,4 +1,5 @@
-﻿using ImageApp.BLL.Implementation;
+﻿using ImageApp.BLL.Extensions;
+using ImageApp.BLL.Implementation;
 using ImageApp.BLL.Interface;
 using ImageApp.DAL.DataBase;
 using ImageApp.DAL.Entities;
@@ -18,16 +19,19 @@ namespace ImageApp.Extensions
             services.AddScoped<IGenerateEmailVerificationPage, GenerateEmailVerificationPage>();
             services.AddHttpContextAccessor();
 
-            //services.Configure<EmailSenderOptions>(configuration.GetSection("EmailSenderOptions"));
-        }
+			services.Configure<DataProtectionTokenProviderOptions>(x => x.TokenLifespan = TimeSpan.FromMinutes(10));
+
+			//services.Configure<EmailSenderOptions>(GetSection("EmailSenderOptions"));
+		}
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ImageAppDbContext>()
-                .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(opt =>
+                .AddDefaultTokenProviders()
+                .AddPasswordlessLoginTotpTokenProvider();
+               
+			services.Configure<IdentityOptions>(opt =>
             {
                 opt.Password.RequiredLength = 6;
                 opt.Password.RequireNonAlphanumeric = false;
@@ -37,6 +41,7 @@ namespace ImageApp.Extensions
                 opt.User.RequireUniqueEmail = true;
                 opt.Lockout.MaxFailedAccessAttempts = 3;
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+
             });
             services.AddHttpContextAccessor();
             services.ConfigureApplicationCookie(options =>
@@ -69,5 +74,20 @@ namespace ImageApp.Extensions
                 await roleManager.CreateAsync(role);
             }
         }
-    }
+
+
+		public class PasswordlessLoginTotpTokenProvider<TUser> : TotpSecurityStampBasedTokenProvider<TUser>where TUser : class
+		{
+			public override Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<TUser> manager, TUser user)
+			{
+				return Task.FromResult(false);
+			}
+
+			public override async Task<string> GetUserModifierAsync(string purpose, UserManager<TUser> manager, TUser user)
+			{
+				var email = await manager.GetEmailAsync(user);
+				return "PasswordlessLogin:" + purpose + ":" + email;
+			}
+		}
+	}
 }
