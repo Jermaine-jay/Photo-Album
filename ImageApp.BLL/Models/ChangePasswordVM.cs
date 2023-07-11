@@ -5,7 +5,6 @@ namespace ImageApp.BLL.Models
     public class ChangePasswordVM
     {
         public string UserId { get; set; }
-        //public string Code { get; set; }
 
         [Required, DataType(DataType.Password)]
         public string OldPassword { get; set; }

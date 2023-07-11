@@ -11,19 +11,13 @@ namespace ImageApp.Controllers
 	[Route("[controller]/[action]/{id?}")]
 	public class UserController : Controller
 	{
-		private readonly IUserServices _userServices;
 		private readonly IHttpContextAccessor _httpContextAccessor;
-		private readonly IUrlHelperFactory _urlHelperFactory;
-		private readonly IAuthenticationService _authenticationService;
-		private readonly IRecoveryService _recoveryService;
+		private readonly IServiceFactory _serviceFactory;
 
-		public UserController(IUserServices userServices, IRecoveryService recoveryService, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAuthenticationService authenticationService)
+		public UserController(IServiceFactory serviceFactory, IHttpContextAccessor httpContextAccessor)
 		{
-			_userServices = userServices;
+			_serviceFactory = serviceFactory;
 			_httpContextAccessor = httpContextAccessor;
-			_urlHelperFactory = urlHelperFactory;
-			_authenticationService = authenticationService;
-			_recoveryService = recoveryService;
 		}
 
 		public IActionResult WaitingPage()
@@ -39,8 +33,6 @@ namespace ImageApp.Controllers
 		}
 
 
-
-		[Authorize(Roles = "User")]
 		public IActionResult RegisterUser()
 		{
 			return View(new RegisterVM());
@@ -58,7 +50,7 @@ namespace ImageApp.Controllers
 		public async Task<IActionResult> Profile()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var user = await _userServices.UserProfileAsync(userId);
+			var user = await _serviceFactory.GetService<IUserServices>().UserProfileAsync(userId);
 			if (user == null)
 			{
 				return View(new ProfileVM());
@@ -70,7 +62,7 @@ namespace ImageApp.Controllers
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> AllUsers()
 		{
-			var model = await _userServices.GetUsers();
+			var model = await _serviceFactory.GetService<IUserServices>().GetUsers();
 			return View(model);
 		}
 
@@ -81,10 +73,10 @@ namespace ImageApp.Controllers
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (Id != null)
 			{
-				var result = await _userServices.GetUser(Id);
+				var result = await _serviceFactory.GetService<IUserServices>().GetUser(Id);
 				return View(result);
 			}
-			var user = await _userServices.GetUser(Id);
+			var user = await _serviceFactory.GetService<IUserServices>().GetUser(Id);
 			return View(userId);
 		}
 
@@ -108,7 +100,7 @@ namespace ImageApp.Controllers
 
 		public async Task<IActionResult> ConfirmEmail(string userId, string code)
 		{
-			var (successful, msg) = await _authenticationService.ConfirmEmail(userId, code);
+			var (successful, msg) = await _serviceFactory.GetService<IAuthenticationService>().ConfirmEmail(userId, code);
 			if (successful)
 			{
 				TempData["SuccessMsg"] = msg;
@@ -120,13 +112,12 @@ namespace ImageApp.Controllers
 
 
 
-        [HttpPost]
+		[HttpPost]
 		public async Task<IActionResult> SaveUser(RegisterVM model)
 		{
 			if (ModelState.IsValid)
 			{
-				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
-				var (successful, msg) = await _userServices.RegisterUser(urlHelper, model);
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().RegisterUser(model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -144,8 +135,8 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
-				var (successful, msg) = await _userServices.RegisterUser(urlHelper, model);
+
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().RegisterAdmin(model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -163,7 +154,7 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.Update(model);
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().Update(model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -175,12 +166,13 @@ namespace ImageApp.Controllers
 			return View("UpdateUser");
 		}
 
+
 		[HttpPost]
 		public async Task<IActionResult> SignIn(SignInVM model)
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.SignIn(model);
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().SignIn(model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -198,7 +190,7 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.SignOut();
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().SignOut();
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -217,7 +209,7 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.DeleteAsync(userId);
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().DeleteAsync(userId);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -230,14 +222,13 @@ namespace ImageApp.Controllers
 		}
 
 
-
 		[HttpPost]
 		[Authorize]
 		public async Task<IActionResult> DeleteMyAccount(string userId)
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _userServices.DeleteAsync(userId);
+				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().DeleteAsync(userId);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -250,14 +241,13 @@ namespace ImageApp.Controllers
 		}
 
 
-
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ResetUserPassword(ResetPasswordVM model)
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _recoveryService.ResetPassword(model);
+				var (successful, msg) = await _serviceFactory.GetService<IRecoveryService>().ResetPassword(model);
 				if (successful)
 				{
 					TempData["SuccessMsg"] = msg;
@@ -270,7 +260,6 @@ namespace ImageApp.Controllers
 		}
 
 
-
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UserForgotPassword(ForgotPasswordVM model)
@@ -278,7 +267,7 @@ namespace ImageApp.Controllers
 			if (ModelState.IsValid)
 			{
 				var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
-				var (successful, msg) = await _recoveryService.ForgotPassword(urlHelper, model);
+				var (successful, msg) = await _serviceFactory.GetService<IRecoveryService>().ForgotPassword(urlHelper, model);
 
 				if (successful)
 				{
@@ -293,27 +282,26 @@ namespace ImageApp.Controllers
 		}
 
 
-
-        public async Task<ActionResult> ChangePassword()
-        {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return View(new ChangePasswordVM { UserId = userId });
-        }
-
-
-        public async Task<IActionResult> ConfirmToken()
-        {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return View(new ConfirmTokenVM { UserId = userId });
-        }
+		public async Task<ActionResult> ChangePassword()
+		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			return View(new ChangePasswordVM { UserId = userId });
+		}
 
 
-		//[Authorize]
+		public async Task<IActionResult> ConfirmToken()
+		{
+			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+			return View(new ConfirmTokenVM { UserId = userId });
+		}
+
+
+		[Authorize]
 		public async Task<IActionResult> UserChangePassword()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var urlHelper = _urlHelperFactory.GetUrlHelper(ControllerContext);
-			var (successful, msg) = await _recoveryService.ChangePasswordToken(urlHelper, userId);
+			var (successful, msg) = await _serviceFactory.GetService<IRecoveryService>().ChangeDetailToken(urlHelper, userId);
 			if (successful)
 			{
 				TempData["SuccessMsg"] = msg;
@@ -324,27 +312,25 @@ namespace ImageApp.Controllers
 		}
 
 
-
 		[HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmUserToken(ConfirmTokenVM model)
-        {
-            if (ModelState.IsValid)
-            {
-                var (successful, msg) = await _recoveryService.VerifyChangePasswordToken(model);
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ConfirmUserToken(ConfirmTokenVM model)
+		{
+			if (ModelState.IsValid)
+			{
+				var (successful, msg) = await _serviceFactory.GetService<IRecoveryService>().VerifyChangeDetailToken(model);
 
-                if (successful)
-                {
-                    TempData["SuccessMsg"] = msg;
-                    return RedirectToAction("ChangePassword");
-                }
-                TempData["ErrMsg"] = msg;
-                return View("ConfirmToken");
-            }
-            return View("ConfirmToken");
+				if (successful)
+				{
+					TempData["SuccessMsg"] = msg;
+					return RedirectToAction("ChangePassword");
+				}
+				TempData["ErrMsg"] = msg;
+				return View("ConfirmToken");
+			}
+			return View("ConfirmToken");
 
-        }
-
+		}
 
 
 		[HttpPost]
@@ -353,7 +339,7 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var (successful, msg) = await _recoveryService.ChangePassword(model);
+				var (successful, msg) = await _serviceFactory.GetService<IRecoveryService>().ChangePassword(model);
 
 				if (successful)
 				{

@@ -30,7 +30,7 @@ namespace ImageApp.BLL.Implementation
 			_authenticationService = authenticationService;
 		}
 
-		public async Task<(bool successful, string msg)> RegisterAdmin(IUrlHelper urlHelper, RegisterVM register)
+		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
 		{
 			var (newUser, msg) = await CreateAUser(register);
 			if (newUser == null)
@@ -41,7 +41,7 @@ namespace ImageApp.BLL.Implementation
 
 			if (result.Succeeded)
 			{
-				_ = _authenticationService.RegistrationMail(urlHelper, newUser);
+				_ = _authenticationService.RegistrationMail(newUser);
 
 				await _userManager.AddToRoleAsync(newUser, "Admin");
 				await _signInManager.SignInAsync(newUser, isPersistent: false);
@@ -57,7 +57,7 @@ namespace ImageApp.BLL.Implementation
 			return (false, $"Failed to create User");
 		}
 
-		public async Task<(bool successful, string msg)> RegisterUser(IUrlHelper urlHelper, RegisterVM register)
+		public async Task<(bool successful, string msg)> RegisterUser(RegisterVM register)
 		{
 			var (newUser, msg )= await CreateAUser(register);
 			if (newUser == null)
@@ -68,7 +68,7 @@ namespace ImageApp.BLL.Implementation
 
 			if (result.Succeeded)
 			{
-				_ = _authenticationService.RegistrationMail(urlHelper, newUser);
+				_ = _authenticationService.RegistrationMail(newUser);
 
 				await _userManager.AddToRoleAsync(newUser, "User");
 				await _signInManager.SignInAsync(newUser, isPersistent: false);
@@ -112,6 +112,8 @@ namespace ImageApp.BLL.Implementation
 			return (true, $"logged out successfully!");
 		}
 
+
+
 		public async Task<(bool successful, string msg)> Update(UserVM model)
 		{
 
@@ -128,6 +130,8 @@ namespace ImageApp.BLL.Implementation
 			return rowChanges != null ? (true, $"User detail update was successful!") : (false, "Failed To save changes!");
 		}
 
+
+
 		public async Task<(bool successful, string msg)> DeleteAsync(string userId)
 		{
 			var user = await _userRepo.GetSingleByAsync(u => u.Id == userId);
@@ -139,6 +143,8 @@ namespace ImageApp.BLL.Implementation
 			await _userRepo.DeleteAsync(user);
 			return await _unitOfWork.SaveChangesAsync() >= 0 ? (true, $"{user.UserName} deleted") : (false, $"Delete Failed");
 		}
+
+
 
 		public async Task<(User, string msg)> CreateAUser(RegisterVM register)
 		{
@@ -165,6 +171,8 @@ namespace ImageApp.BLL.Implementation
 			return (newUser, "Valid Email"); ;
 		}
 
+
+
 		public async Task<ProfileVM> UserProfileAsync(string userId)
 		{
 			var u = await _userRepo.GetSingleByAsync(u => u.Id == userId);
@@ -184,12 +192,16 @@ namespace ImageApp.BLL.Implementation
 			return useres;
 		}
 
+
+
 		public async Task<ProfileVM> GetUser(string Id)
 		{
 			var user = await _userRepo.GetSingleByAsync(u => u.Id == Id);
 			var Auser = _mapper.Map<ProfileVM>(user);
 			return Auser;
 		}
+
+
 
 		public async Task<IEnumerable<ProfileVM>> GetUsers()
 		{

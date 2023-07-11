@@ -17,11 +17,9 @@ namespace ImageApp.Extensions
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRecoveryService, RecoveryService>();
             services.AddScoped<IGenerateEmailVerificationPage, GenerateEmailVerificationPage>();
-            services.AddHttpContextAccessor();
-
+			services.AddScoped<IServiceFactory, ServiceFactory>();
+			services.AddHttpContextAccessor();
 			services.Configure<DataProtectionTokenProviderOptions>(x => x.TokenLifespan = TimeSpan.FromMinutes(10));
-
-			//services.Configure<EmailSenderOptions>(GetSection("EmailSenderOptions"));
 		}
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -30,7 +28,8 @@ namespace ImageApp.Extensions
                 .AddEntityFrameworkStores<ImageAppDbContext>()
                 .AddDefaultTokenProviders()
                 .AddPasswordlessLoginTotpTokenProvider();
-               
+
+
 			services.Configure<IdentityOptions>(opt =>
             {
                 opt.Password.RequiredLength = 6;

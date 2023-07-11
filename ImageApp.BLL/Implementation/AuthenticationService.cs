@@ -1,8 +1,10 @@
 ﻿using ImageApp.BLL.Extensions;
 using ImageApp.BLL.Interface;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -19,11 +21,17 @@ namespace ImageApp.BLL.Implementation
         private readonly IConfiguration _configuration;
         private readonly IGenerateEmailVerificationPage _generateEmailVerificationPage;
 
-        private string? _ApiKey;
+        private readonly LinkGenerator _linkGenerator;
+		private readonly IHttpContextAccessor _accessor;
+
+
+		private string? _ApiKey;
         private string? _Url;
 
-        public AuthenticationService(IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
+        public AuthenticationService(LinkGenerator linkGenerator,IHttpContextAccessor httpContextAccessor, IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
         {
+            _linkGenerator = linkGenerator;
+            _accessor = httpContextAccessor;
             _userManager = userManager;
             _configuration = configuration;
             _emailSenderOptions = optionsAccessor.Value;
@@ -113,10 +121,10 @@ namespace ImageApp.BLL.Implementation
         }
 
 
-        public async Task<bool> RegistrationMail(IUrlHelper urlHelper, User newUser)
+        public async Task<bool> RegistrationMail(User newUser)
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-            var callbackUrl = urlHelper.Action("ConfirmEmail", "User", new { userId = newUser.Id, code }, protocol: "https");
+            var callbackUrl = _linkGenerator.GetUriByAction(_accessor.HttpContext, "ConfirmEmail", "User", new { userId = newUser.Id, code });
             _ = await SendEmailAsync(newUser.Email, "Confirm your email",
                 _generateEmailVerificationPage.EmailVerificationPage(newUser.UserName, callbackUrl));
 
