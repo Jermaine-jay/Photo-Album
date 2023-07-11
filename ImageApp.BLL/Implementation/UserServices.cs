@@ -57,6 +57,7 @@ namespace ImageApp.BLL.Implementation
 			return (false, $"Failed to create User");
 		}
 
+
 		public async Task<(bool successful, string msg)> RegisterUser(RegisterVM register)
 		{
 			var (newUser, msg )= await CreateAUser(register);

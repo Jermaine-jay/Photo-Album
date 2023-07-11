@@ -2,9 +2,10 @@
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Entities;
 using ImageApp.DAL.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Routing;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -16,14 +17,21 @@ namespace ImageApp.BLL.Implementation
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IServiceFactory _serviceFactory;
 
-		public RecoveryService(IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> SignInManager, IUnitOfWork unitOfWork)
+		private readonly LinkGenerator _linkGenerator;
+		private readonly IHttpContextAccessor _httpContextAccessor;
+
+
+		public RecoveryService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> SignInManager, IUnitOfWork unitOfWork)
 		{
+			_linkGenerator = linkGenerator;
 			_serviceFactory = serviceFactory;
+			_httpContextAccessor = httpContextAccessor;
 			_userManager = userManager;
 			_signInManager = SignInManager;
 			_unitOfWork = unitOfWork;
 			_userRepo = _unitOfWork?.GetRepository<User>();
 		}
+
 
 		public async Task<(bool successful, string msg)> ChangeEmail(string userId, string code)
 		{
@@ -34,8 +42,9 @@ namespace ImageApp.BLL.Implementation
 			{
 				return (true, "Email Changed Successfully");
 			}
-				return (true, "Failed to change Email");
+			return (true, "Failed to change Email");
 		}
+
 
 
 		public async Task<string> ResetEmailToken(string userId)
@@ -50,7 +59,8 @@ namespace ImageApp.BLL.Implementation
 		}
 
 
-		public async Task<(bool successful, string msg)> ForgotPassword(IUrlHelper urlHelper, ForgotPasswordVM model)
+
+		public async Task<(bool successful, string msg)> ForgotPassword(ForgotPasswordVM model)
 		{
 
 			var verify = await _serviceFactory.GetService<IAuthenticationService>().VerifyEmail(model.Email);
@@ -66,12 +76,13 @@ namespace ImageApp.BLL.Implementation
 			}
 
 			var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-			var callbackUrl = urlHelper.Action("ResetPassword", "User", new { UserId = user.Id, code }, protocol: "https");
+			var callbackUrl = _linkGenerator.GetUriByAction(_httpContextAccessor.HttpContext, action:"ResetPassword", controller:"User", values:new { UserId = user.Id, code });
 			var page = _serviceFactory.GetService<IGenerateEmailVerificationPage>().PasswordResetPage(callbackUrl);
 
 			await _serviceFactory.GetService<IAuthenticationService>().SendEmailAsync(model.Email, "Reset Password", page);
 			return (true, "Reset Password Email Sent");
 		}
+
 
 
 		public async Task<(bool successful, string msg)> ResetPassword(ResetPasswordVM model)
@@ -96,7 +107,7 @@ namespace ImageApp.BLL.Implementation
 		}
 
 
-		public async Task<(bool successful, string msg)> ChangeDetailToken(IUrlHelper urlHelper, string userId)
+		public async Task<(bool successful, string msg)> ChangeDetailToken(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
@@ -129,6 +140,7 @@ namespace ImageApp.BLL.Implementation
 			return (false, "Verification failed");
 
 		}
+
 
 
 		public async Task<(bool successful, string msg)> ChangePassword(ChangePasswordVM model)
