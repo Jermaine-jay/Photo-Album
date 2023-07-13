@@ -21,6 +21,7 @@ builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection(
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterServices();
 builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJwt(builder.Configuration);
 // Add services to the container.
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<ImageAppDbContext>>();

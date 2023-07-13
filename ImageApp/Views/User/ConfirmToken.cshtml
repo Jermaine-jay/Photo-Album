@@ -29,12 +29,13 @@
 			<form class="form-detail" id="myForm" asp-controller="User" asp-action="ConfirmUserToken">
 
 				<div class="alert-danger" asp-validation-summary="@ValidationSummary.ModelOnly"></div>
+
 				<h2>Verify Token</h2>
 
 				<div class="form-row">
-					<label asp-for="@Model.UserId" class="form-label"></label>
-					<input type="text" class="input-text" style="align-items:center" asp-for="@Model.UserId" required />
-					<span asp-validation-for="@Model.UserId" style="color: red;"></span>
+					
+					<input type="hidden" class="input-text" style="align-items:center" asp-for="@Model.UserId" required />
+					
 				</div>
 
 				<div class="form-row">

@@ -35,8 +35,9 @@ namespace ImageApp.BLL.Implementation
             _userManager = userManager;
             _configuration = configuration;
             _emailSenderOptions = optionsAccessor.Value;
-            _ApiKey = _configuration.GetSection("ZeroBook").GetSection("ApiKey")?.Value;
-            _Url = _configuration.GetSection("ZeroBook").GetSection("Url")?.Value;
+            //_ApiKey = _configuration.GetSection("ZeroBook").GetSection("ApiKey")?.Value;
+            _ApiKey = _configuration["ZeroBook:ApiKey"];
+            _Url = _configuration["ZeroBook:Url"];
             _generateEmailVerificationPage = Page;
         }
 

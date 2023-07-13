@@ -26,7 +26,6 @@ namespace ImageApp.Controllers
 		}
 
 
-		[Authorize]
 		public IActionResult ForgotPassword()
 		{
 			return View(new ForgotPasswordVM());
@@ -317,6 +316,7 @@ namespace ImageApp.Controllers
 		}
 
 
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ConfirmUserToken(ConfirmTokenVM model)
@@ -336,6 +336,7 @@ namespace ImageApp.Controllers
 			return View("ConfirmToken");
 
 		}
+
 
 
 		[HttpPost]
