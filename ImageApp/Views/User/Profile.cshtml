@@ -4,7 +4,7 @@
 }
 
 
-@model ImageApp.BLL.Models.ProfileVM;
+@model ImageApp.BLL.Models.CombinedVM;
 
     
  <section class="mt-4">
@@ -26,7 +26,7 @@
 }
 
 <section id="about" class="about">
-    <div class="container" data-aos="fade-up">
+    <div class="container shadow-lg p-3 mb-5 bg-white rounded w-50" data-aos="fade-up">
 
         <div class="section-title">
             <h2>Profie</h2>
@@ -40,60 +40,76 @@
                 <div class="col-lg-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
                     <div class="portfolio-item filter-app">
                     <div class="portfolio-wrap">
-                    @if (Model.ProfileImagePath == null)
+                    @if (Model.User.ProfileImagePath == "Blank-Pfp.jpg")
                     {
                         <img src="~/img/Blank-Pfp.jpg" class="img-fluid" alt="">
                     }
-                    else{                             
-                          <img src="~/img/@Model.ProfileImagePath" class="img-fluid" alt="">
-                        }
+                    else
+                    {                             
+                          <img src="~/img/ProfileImages/@Model.User.ProfileImagePath" class="img-fluid" alt="">
+                    }
                         <div class="portfolio-info">
-                            <h4>@Model.UserName</h4>
                             <div class="portfolio-links">
-                                <a href="~/img/@Model.ProfileImagePath" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@Model.UserName"><i class="bx bx-plus"></i></a>
-                                <a asp-controller="Images" asp-action="GetPicture" class="portfolio-details-lightbox" data-glightbox="type: external" title="Portfolio Details"><i class="fa-solid fa-camera fa-lg" ></i></a>
+                                 <a href="~/img/@Model.User.ProfileImagePath" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@Model.User.UserName"><i class="bx bx-plus"></i></a>
+                                
                             </div>
                         </div>
                     </div>
+                    <form asp-controller="User" asp-action="UpdateProfileImage" class="portfolio-details-lightbox" data-glightbox="type: external" enctype="multipart/form-data">
+                        <div class="alert-danger" asp-validation-summary="@ValidationSummary.ModelOnly"></div>
+
+                        <div class="col-12">
+                            <div class="custom-file form-control">
+                                <input asp-for="@Model.Image.ProfileImagePath" type="file" accept=".png, .jpg, .jpeg" required>
+                                <span asp-validation-for="@Model.Image.ProfileImagePath"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button class="btn btn-success btn-sm" type="submit">update</button>
+                        </div>
+                    </form>
                 </div>
             </div>
                   
         
             <div class="col-lg-8 pt-4 pt-lg-0 content mx-5">
-                <h3>@Model.UserName</h3>
+                <h3>@Model.User.UserName</h3>
                 <p class="fst-italic">
                     
                 </p>
                 <div class="row">
                     <div class="col-lg-6">
                         <ul>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Email: </strong>@Model.Email</li>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Phone: </strong>@Model.PhoneNumber</li>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Address: </strong>@Model.Address</li>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Gender: </strong>@Model.Gender</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Phone: </strong>@Model.User.UserName</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Email: </strong>@Model.User.Email</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Address: </strong>@Model.User.Address</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Gender: </strong>@Model.User.Gender</li>
                         </ul>
                     </div>
                     <div class="col-lg-6">
                         <ul>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Age: </strong>@Model.Age</li>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Birthday: </strong>@Model.DateOfBirth</li>
-                            <li><i class="bi bi-rounded-right"></i> <strong>Photos: </strong> @Model.Id</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Age: </strong>@Model.User.Age</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Birthday: </strong>@Model.User.DateOfBirth</li>
+                            <li><i class="bi bi-rounded-right"></i> <strong>Photos: </strong> @Model.User.PhoneNumber</li>
                         </ul>
                     </div>
-                </div>
+                        Edit User
+                    @if (User.IsInRole("User"))
+                    {
+                        <span class="px-1">
+                            <a asp-controller="User" asp-action="UpdateUser" asp-route-Id="@Model.User.Id" title="Update User">
+                            <i class="fa-sharp fa-solid fa-file-pen fa-2xl" style="color: black"></i>
+                            </a>
+                        </span>
+                    }
+                    </div>
                 <p>
                    
                 </p>
             </div>
         </div>
-            @if (User.IsInRole("User"))
-            {
-                <span class="px-1">
-                    <a asp-controller="User" asp-action="UpdateUser" asp-route-Id="@Model.Id" title="Update User">
-                        <i class="fa-sharp fa-solid fa-file-pen fa-2xl" style="color: black"></i>
-                    </a>
-                </span>
-            } : Edit User
+            
     </div>
 </section>
 

@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using ImageApp.BLL.Extensions;
 using ImageApp.BLL.Interface;
 using ImageApp.BLL.Models;
 using ImageApp.DAL.Enums;
 using ImageApp.DAL.Repository;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using User = ImageApp.DAL.Entities.User;
 
 namespace ImageApp.BLL.Implementation
@@ -18,17 +16,23 @@ namespace ImageApp.BLL.Implementation
 		private readonly IMapper _mapper;
 		private readonly IRepository<User> _userRepo;
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly IAuthenticationService _authenticationService;
+		private readonly IServiceFactory _serviceFactory;
+		private readonly IWebHostEnvironment _webHostEnvironment;
 
-		public UserServices(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork, IAuthenticationService authenticationService)
+		public UserServices(IWebHostEnvironment webHostEnvironment, IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
+			_serviceFactory = serviceFactory;
+			_webHostEnvironment = webHostEnvironment;
 			_unitOfWork = unitOfWork;
 			_userRepo = _unitOfWork?.GetRepository<User>();
 			_mapper = mapper;
-			_authenticationService = authenticationService;
+
+			
 		}
+
+
 
 		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
 		{
@@ -41,12 +45,13 @@ namespace ImageApp.BLL.Implementation
 
 			if (result.Succeeded)
 			{
-				_ = _authenticationService.RegistrationMail(newUser);
-
+				await _serviceFactory.GetService<IAuthenticationService>().RegistrationMail(newUser);
 				await _userManager.AddToRoleAsync(newUser, "Admin");
+
 				await _signInManager.SignInAsync(newUser, isPersistent: false);
 				return result.Succeeded ? (true, "User created successfully!, Verification Mail Sent") : (false, "Failed to create User, Couldn't Send Mail");
 			}
+
 			if (!result.Succeeded)
 			{
 				foreach (var error in result.Errors)
@@ -60,7 +65,7 @@ namespace ImageApp.BLL.Implementation
 
 		public async Task<(bool successful, string msg)> RegisterUser(RegisterVM register)
 		{
-			var (newUser, msg )= await CreateAUser(register);
+			var (newUser, msg) = await CreateAUser(register);
 			if (newUser == null)
 			{
 				return (false, msg);
@@ -69,20 +74,21 @@ namespace ImageApp.BLL.Implementation
 
 			if (result.Succeeded)
 			{
-				_ = _authenticationService.RegistrationMail(newUser);
-
+				await _serviceFactory.GetService<IAuthenticationService>().RegistrationMail(newUser);
 				await _userManager.AddToRoleAsync(newUser, "User");
+
 				await _signInManager.SignInAsync(newUser, isPersistent: false);
 				return result.Succeeded ? (true, "User created successfully!, Verification Mail Sent") : (false, "Failed to create User, Couldn't Send Mail");
 			}
+
 			if (!result.Succeeded)
 			{
 				foreach (var error in result.Errors)
 				{
 					return (false, $"Failed to create User.{error.Description}");
-				} 
-			}         
-            return (false, $"Failed to create User");
+				}
+			}
+			return (false, $"Failed to create User");
 		}
 
 
@@ -95,11 +101,14 @@ namespace ImageApp.BLL.Implementation
 			}
 			else
 			{
-				user = await _userManager.FindByNameAsync(signIn.UsernameOrEmail);
+                
+                user = await _userManager.FindByNameAsync(signIn.UsernameOrEmail);
 			}
 
-			if (user != null)
+			var existingUser = await _userManager.CheckPasswordAsync(user, signIn.Password);
+			if (existingUser)
 			{
+
 				var result = await _signInManager.PasswordSignInAsync(user, signIn.Password, signIn.RememberMe, true);
 				return result.Succeeded ? (true, $"{user.UserName} logged in successfully!") : (false, "Failed to login");
 			}
@@ -119,7 +128,7 @@ namespace ImageApp.BLL.Implementation
 		{
 
 			var user = await _userRepo.GetSingleByAsync(u => u.Id == model.Id);
-			var verify = await _authenticationService.VerifyEmail(model.Email);
+			var verify = await _serviceFactory.GetService<IAuthenticationService>().VerifyEmail(model.Email);
 			if (verify == false)
 			{
 				return (false, $"Invalid Email Address");
@@ -153,7 +162,7 @@ namespace ImageApp.BLL.Implementation
 			int year = int.Parse(dateComponents[0]);
 			int age = DateTime.Now.Year - year;
 
-			var verify = await _authenticationService.VerifyEmail(register.Email);
+			var verify = await _serviceFactory.GetService<IAuthenticationService>().VerifyEmail(register.Email);
 			if (verify == false)
 			{
 				return (null, "Invalid Email Address");
@@ -216,11 +225,46 @@ namespace ImageApp.BLL.Implementation
 				Gender = u.Gender.ToString(),
 				Age = u.Age,
 				PhoneNumber = u.PhoneNumber,
-				Address= u.Address,
+				Address = u.Address,
 			});
 			return userViewModels;
 		}
 
-        
+
+        public async Task<(bool successful, string msg)> UpdateProfileImage(ProfileImageVM model, string userId)
+        {
+            var user = await _userRepo.GetSingleByAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return (true, "User Does not exist!");
+            }
+
+
+            var fileName = model.ProfileImagePath.FileName;
+            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "img", "ProfileImages");
+
+
+            if (!Directory.Exists(imagePath))
+            {
+                Directory.CreateDirectory(imagePath);
+            }
+
+			/*var existing  = Path.Combine(imagePath, user.ProfileImagePath);
+			if(user.ProfileImagePath != "Blank-Pfp.jpg" || !File.Exists(existing))
+			{
+				File.Delete(existing);
+			}
+*/
+            string picPath = Path.Combine(imagePath, fileName);
+            using (var stream = new FileStream(picPath, FileMode.Create))
+            {
+                await model.ProfileImagePath.CopyToAsync(stream);
+            }
+
+
+            user.ProfileImagePath = model.ProfileImagePath.FileName;
+            var result = await _userRepo.UpdateAsync(user);
+            return (true, "Profile picture updated!");
+        }
     }
 }

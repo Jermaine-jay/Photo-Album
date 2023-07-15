@@ -14,5 +14,9 @@ namespace ImageApp.BLL.Interface
 		Task<ProfileVM> GetUser(string userId);
 		Task<IEnumerable<ProfileVM>> GetUsers();
 
-	}
+		Task<(bool successful, string msg)> UpdateProfileImage(ProfileImageVM model, string userId);
+
+
+
+    }
 }

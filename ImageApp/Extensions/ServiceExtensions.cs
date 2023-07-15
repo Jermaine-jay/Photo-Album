@@ -1,5 +1,7 @@
 ﻿using ImageApp.BLL.Implementation;
 using ImageApp.BLL.Interface;
+using ImageApp.BLL.Jwt.Implementation;
+using ImageApp.BLL.Jwt.Interface;
 using ImageApp.DAL.DataBase;
 using ImageApp.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +21,7 @@ namespace ImageApp.Extensions
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
 			services.AddScoped<IRecoveryService, RecoveryService>();
 			services.AddScoped<IGenerateEmailVerificationPage, GenerateEmailVerificationPage>();
+			services.AddScoped<IJwtConfigurations, JwtConfigurations>();
 			services.AddScoped<IServiceFactory, ServiceFactory>();
 			services.AddHttpContextAccessor();
 			services.Configure<DataProtectionTokenProviderOptions>(x => x.TokenLifespan = TimeSpan.FromMinutes(10));
@@ -52,7 +55,6 @@ namespace ImageApp.Extensions
 				options.LoginPath = "/User/SignIn";
 			});
 		}
-
 
 
 		public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)

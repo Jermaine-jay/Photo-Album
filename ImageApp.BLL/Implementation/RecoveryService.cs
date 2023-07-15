@@ -5,6 +5,8 @@ using ImageApp.DAL.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace ImageApp.BLL.Implementation
 {
@@ -75,7 +77,9 @@ namespace ImageApp.BLL.Implementation
 			}
 
 			var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-			var callbackUrl = _linkGenerator.GetUriByAction(_httpContextAccessor.HttpContext, action: "ResetPassword", controller: "User", values: new { UserId = user.Id, code });
+			var callbackUrl = _linkGenerator.GetUriByAction(_httpContextAccessor.HttpContext, action: "ResetPassword",
+				controller: "User", values: new { UserId = user.Id, code });
+
 			var page = _serviceFactory.GetService<IGenerateEmailVerificationPage>().PasswordResetPage(callbackUrl);
 
 			await _serviceFactory.GetService<IAuthenticationService>().SendEmailAsync(model.Email, "Reset Password", page);
@@ -114,8 +118,8 @@ namespace ImageApp.BLL.Implementation
 				return (false, "User doesn't exist");
 			}
 
-			var token = await _userManager.GenerateUserTokenAsync(user, "PasswordlessLoginTotpProvider", "passwordless-auth");
-			var page = _serviceFactory.GetService<IGenerateEmailVerificationPage>().ChangePasswordPage(token);
+			var token = await _userManager.GenerateUserTokenAsync(user, "PasswordlessLoginTotpProvider", "passwordless-auth");		
+            var page = _serviceFactory.GetService<IGenerateEmailVerificationPage>().ChangePasswordPage(token);
 
 			await _serviceFactory.GetService<IAuthenticationService>().SendEmailAsync(user.Email, "Change Details", page);
 			return (true, "Change Detail Email Sent");

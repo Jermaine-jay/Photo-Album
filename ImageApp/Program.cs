@@ -5,7 +5,6 @@ using ImageApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ImageAppDbContext>(opts =>
@@ -14,9 +13,7 @@ builder.Services.AddDbContext<ImageAppDbContext>(opts =>
     opts.UseSqlServer(defaultConn);
 });
 
-
 builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
-
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterServices();
@@ -40,6 +37,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 //app.UseSession();
 app.UseHttpsRedirection();

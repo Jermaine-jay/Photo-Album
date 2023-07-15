@@ -1,4 +1,7 @@
-﻿using ImageApp.BLL.Interface;
+﻿using AutoMapper;
+using ImageApp.BLL.Implementation;
+using ImageApp.BLL.Interface;
+using ImageApp.BLL.Jwt.Interface;
 using ImageApp.BLL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +16,14 @@ namespace ImageApp.Controllers
 	{
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly IServiceFactory _serviceFactory;
+	
 
 		public UserController(IServiceFactory serviceFactory, IHttpContextAccessor httpContextAccessor)
 		{
 			_serviceFactory = serviceFactory;
 			_httpContextAccessor = httpContextAccessor;
 		}
+
 
 		public IActionResult WaitingPage()
 		{
@@ -45,17 +50,22 @@ namespace ImageApp.Controllers
 		}
 
 
-		[Authorize]
+
+		//[Authorize]
 		public async Task<IActionResult> Profile()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var user = await _serviceFactory.GetService<IUserServices>().UserProfileAsync(userId);
-			if (user == null)
+			
+			var profile = new CombinedVM()
 			{
-				return View(new ProfileVM());
-			}
-			return View(user);
-		}
+				User = user,
+				Image = new ProfileImageVM(),
+            };
+            
+            return View(profile);
+        }
+
 
 
 		[Authorize(Roles = "Admin")]
@@ -64,6 +74,7 @@ namespace ImageApp.Controllers
 			var model = await _serviceFactory.GetService<IUserServices>().GetUsers();
 			return View(model);
 		}
+
 
 
 		[Authorize]
@@ -80,10 +91,31 @@ namespace ImageApp.Controllers
 		}
 
 
-		public IActionResult SignIn()
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfileImage(CombinedVM model)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!ModelState.IsValid)
+            {
+                var (successful, msg) = await _serviceFactory.GetService<IUserServices>().UpdateProfileImage(model.Image, userId);
+                if (successful)
+                {
+                    TempData["SuccessMsg"] = msg;
+                    return RedirectToAction("Profile");
+                }
+
+                TempData["ErrMsg"] = msg;
+                return View("Profile");
+            }
+            return View("Profile");
+        }
+
+        public IActionResult SignIn()
 		{
 			return View(new SignInVM());
 		}
+
 
 
 		public IActionResult ResetPassword(string? code, string userId)
@@ -95,6 +127,7 @@ namespace ImageApp.Controllers
 			var model = new ResetPasswordVM { Code = code, UserId = userId };
 			return View(model);
 		}
+
 
 
 		public async Task<IActionResult> ConfirmEmail(string userId, string code)
@@ -135,7 +168,6 @@ namespace ImageApp.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-
 				var (successful, msg) = await _serviceFactory.GetService<IUserServices>().RegisterAdmin(model);
 				if (successful)
 				{
@@ -294,11 +326,13 @@ namespace ImageApp.Controllers
 		}
 
 
+
 		public async Task<IActionResult> ConfirmToken()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			return View(new ConfirmTokenVM { UserId = userId });
 		}
+
 
 
 		[Authorize]
