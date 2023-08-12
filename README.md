@@ -47,7 +47,7 @@ _____
 
 * Run the application: dotnet run
 
-* Access the application in your web browser at http://localhost:7121
+* Access the application in your web browser at http://localhost:7290
 
 
 ## Contributing
@@ -71,5 +71,5 @@ ___
 | UserName   | Password   | Role       |
 | ---------- | ---------- | ---------- |
 | jota10     | 12345qwert | User       |
-| jermaine10 | 12345qwert | SuperAdmin |
-| idan10     | 12345qwert | Admin      |  
+| jermaine10 | 12345qwert | Admin      |
+| idan10     | 12345qwert | User       |  
