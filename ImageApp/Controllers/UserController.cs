@@ -51,7 +51,6 @@ namespace ImageApp.Controllers
 
 
 
-		//[Authorize]
 		public async Task<IActionResult> Profile()
 		{
 			var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -110,6 +109,7 @@ namespace ImageApp.Controllers
             }
             return View("Profile");
         }
+
 
         public IActionResult SignIn()
 		{

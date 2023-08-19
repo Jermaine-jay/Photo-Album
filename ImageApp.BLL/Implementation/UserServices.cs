@@ -27,11 +27,8 @@ namespace ImageApp.BLL.Implementation
 			_webHostEnvironment = webHostEnvironment;
 			_unitOfWork = unitOfWork;
 			_userRepo = _unitOfWork?.GetRepository<User>();
-			_mapper = mapper;
-
-			
+			_mapper = mapper;		
 		}
-
 
 
 		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
@@ -249,12 +246,12 @@ namespace ImageApp.BLL.Implementation
                 Directory.CreateDirectory(imagePath);
             }
 
-			/*var existing  = Path.Combine(imagePath, user.ProfileImagePath);
-			if(user.ProfileImagePath != "Blank-Pfp.jpg" || !File.Exists(existing))
+			if(user.ProfileImagePath != null)
 			{
-				File.Delete(existing);
+				var existing = Path.Combine(imagePath, user.ProfileImagePath);
+                File.Delete(existing);
 			}
-*/
+
             string picPath = Path.Combine(imagePath, fileName);
             using (var stream = new FileStream(picPath, FileMode.Create))
             {

@@ -40,14 +40,16 @@
                 <div class="col-lg-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
                     <div class="portfolio-item filter-app">
                     <div class="portfolio-wrap">
-                    @if (Model.User.ProfileImagePath == "Blank-Pfp.jpg")
+                    @if (Model.User.ProfileImagePath == null)
                     {
                         <img src="~/img/Blank-Pfp.jpg" class="img-fluid" alt="">
                     }
+
                     else
-                    {                             
-                          <img src="~/img/ProfileImages/@Model.User.ProfileImagePath" class="img-fluid" alt="">
+                    {
+                        <img src="~/img/ProfileImages/@Model.User.ProfileImagePath" class="img-fluid" alt="">
                     }
+                    
                         <div class="portfolio-info">
                             <div class="portfolio-links">
                                  <a href="~/img/@Model.User.ProfileImagePath" data-gallery="portfolioGallery" class="portfolio-lightbox" title="@Model.User.UserName"><i class="bx bx-plus"></i></a>
