@@ -60,7 +60,7 @@ using (var scope = app.Services.CreateScope())
     ServiceExtensions.Configure(services);
 }
 
-//await Seeds.EnsurePopulatedAsync(app);
+await Seeds.EnsurePopulatedAsync(app);
 await SeedUsers.EnsurePopulatedAsync(app);
 
 app.Run();

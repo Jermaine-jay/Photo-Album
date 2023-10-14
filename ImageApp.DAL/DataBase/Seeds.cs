@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Channels;
 
 namespace ImageApp.DAL.DataBase
 {
@@ -12,6 +13,7 @@ namespace ImageApp.DAL.DataBase
             ImageAppDbContext context = app.ApplicationServices.CreateScope().ServiceProvider
                 .GetRequiredService<ImageAppDbContext>();
 
+          
             if (!await context.Pictures.AnyAsync())
             {
                 await context.Pictures.AddRangeAsync(AddPictures());
@@ -52,7 +54,7 @@ namespace ImageApp.DAL.DataBase
                 },
 
             };
-            
+
         }
 
         public static IEnumerable<Picture> AddPictures2()
@@ -88,7 +90,7 @@ namespace ImageApp.DAL.DataBase
                 },
 
             };
-            
+
         }
     }
 }

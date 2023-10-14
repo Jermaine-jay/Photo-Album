@@ -64,7 +64,8 @@ namespace ImageApp.DAL.DataBase
                     Age ="22",
                     DateOfBirth = new DateTime(),
                     EmailConfirmed = true,
-                    PhoneNumberConfirmed = true
+                    PhoneNumberConfirmed = true,
+                    Gender = Enums.Gender.Female
                 },
 
                  new User
@@ -77,7 +78,9 @@ namespace ImageApp.DAL.DataBase
                     Age = "21",
                     DateOfBirth = new DateTime(),
                     EmailConfirmed = true,
-                    PhoneNumberConfirmed = true
+                    PhoneNumberConfirmed = true,
+                    Gender = Enums.Gender.Male,
+                    
                 },
 
                 new User
@@ -90,7 +93,8 @@ namespace ImageApp.DAL.DataBase
                     Age ="30",
                     DateOfBirth=new DateTime(),
                     EmailConfirmed = true,
-                    PhoneNumberConfirmed = true
+                    PhoneNumberConfirmed = true,
+                    Gender=Enums.Gender.Others,
                 }
             };
         }
