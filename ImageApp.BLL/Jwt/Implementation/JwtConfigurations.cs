@@ -38,7 +38,6 @@ namespace ImageApp.BLL.Jwt.Implementation
                 expires: DateTime.Now.AddMinutes(10),
                 signingCredentials: credentials);
 
-
             return new JwtSecurityTokenHandler().WriteToken(token);
 
         }

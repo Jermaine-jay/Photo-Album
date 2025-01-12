@@ -21,7 +21,6 @@ namespace ImageApp.Controllers
             _propertyService = propertyService;
         }
 
-
         public IActionResult Home()
         {
             return View();
@@ -35,7 +34,6 @@ namespace ImageApp.Controllers
             var model = await _propertyService.GetUserWithPicturesAsync(userId);
             return View(model);
         }
-
 
         [Authorize(Roles = "User")]
         public async Task<IActionResult> NewImage()
@@ -62,7 +60,6 @@ namespace ImageApp.Controllers
             var model = await _propertyService.GetPicture(userId, pictureId);
             return View(model);
         }
-
 
 		[Authorize]
 		public async Task<IActionResult> AllImages()
@@ -91,7 +88,6 @@ namespace ImageApp.Controllers
             return View("NewImage");
         }
 
-
         [HttpPost]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> SaveUpdate(PictureVM model)
@@ -109,7 +105,6 @@ namespace ImageApp.Controllers
             }
             return View("UpdateImage");
         }
-
 
         [HttpGet]
 		[Authorize(Roles = "User")]
@@ -129,7 +124,6 @@ namespace ImageApp.Controllers
             }
             return View("Album");
         }
-
 
         [HttpGet]
 		[Authorize(Roles = "Admin")]
