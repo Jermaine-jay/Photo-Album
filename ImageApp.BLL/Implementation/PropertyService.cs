@@ -25,7 +25,6 @@ namespace ImageApp.BLL.Implementation
             _webHostEnvironment = webHostEnvironment;
         }
 
-
         public async Task<(bool successful, string msg)> AddOrUpdateAsync(PictureVM model)
         {
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == model.UserId, include: u => u.Include(x => x.Pictures), tracking: true);
@@ -47,8 +46,6 @@ namespace ImageApp.BLL.Implementation
             var rowChanges = await _pictureRepo.AddAsync(newpic);
             return rowChanges != null ? (true, $"Picture uccessfully created!") : (false, "Failed To Create picture!");
         }
-
-
 
         public async Task<(bool successful, string msg)> DeletePictureAsync(string userId, string pictureId)
         {
@@ -76,8 +73,6 @@ namespace ImageApp.BLL.Implementation
             return (false, $"Task with id:{pictureId} was not found");
         }
 
-
-
         public async Task<PictureVM> GetPicture(string userId, string pictureId)
         {
             User? user = await _userRepo.GetSingleByAsync(u => u.Id == userId, include: u => u.Include(x => x.Pictures), tracking: true);
@@ -100,8 +95,6 @@ namespace ImageApp.BLL.Implementation
             }
             return null;
         }
-
-
 
         public async Task<IEnumerable<PictureVM>> GetUserWithPicturesAsync(string userId)
         {

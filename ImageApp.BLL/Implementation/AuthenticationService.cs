@@ -28,7 +28,8 @@ namespace ImageApp.BLL.Implementation
 		private string? _ApiKey;
 		private string? _Url;
 
-		public AuthenticationService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
+		public AuthenticationService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, 
+			IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
 		{
 			_linkGenerator = linkGenerator;
 			_accessor = httpContextAccessor;
@@ -68,11 +69,11 @@ namespace ImageApp.BLL.Implementation
 			return (true, "Verification Mail sent to your Email Address");
 		}
 
-
 		public async Task<bool> Execute(string email, string subject, string htmlMessage)
 		{
 			var message = new MimeMessage();
 			message.From.Add(new MailboxAddress("Image App", _emailSenderOptions.Username));
+
 			message.To.Add(new MailboxAddress(email, email));
 			message.Subject = subject;
 
@@ -87,12 +88,10 @@ namespace ImageApp.BLL.Implementation
 				client.Authenticate(_emailSenderOptions.Email, _emailSenderOptions.Password);
 				client.Send(message);
 				client.Disconnect(true);
-
 			}
 
 			return true;
 		}
-
 
 		public async Task<bool> VerifyEmail(string emailAddress)
 		{
@@ -105,7 +104,7 @@ namespace ImageApp.BLL.Implementation
 					response.EnsureSuccessStatusCode();
 
 					var responseContent = await response.Content.ReadAsStringAsync();
-					var getResponse = JsonConvert.DeserializeObject<dynamic>(responseContent).status;
+					dynamic? getResponse = JsonConvert.DeserializeObject<dynamic>(responseContent).status;
 					if (getResponse == "valid")
 					{
 						return true;
@@ -119,7 +118,6 @@ namespace ImageApp.BLL.Implementation
 				return false;
 			}
 		}
-
 
 		public async Task<bool> RegistrationMail(User newUser)
 		{

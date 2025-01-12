@@ -22,7 +22,8 @@ namespace ImageApp.BLL.Implementation
 		private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-		public RecoveryService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> SignInManager, IUnitOfWork unitOfWork)
+		public RecoveryService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, 
+			IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> SignInManager, IUnitOfWork unitOfWork)
 		{
 			_linkGenerator = linkGenerator;
 			_serviceFactory = serviceFactory;
@@ -59,8 +60,6 @@ namespace ImageApp.BLL.Implementation
 			return null;
 		}
 
-
-
 		public async Task<(bool successful, string msg)> ForgotPassword(ForgotPasswordVM model)
 		{
 
@@ -86,8 +85,6 @@ namespace ImageApp.BLL.Implementation
 			return (true, "Reset Password Email Sent");
 		}
 
-
-
 		public async Task<(bool successful, string msg)> ResetPassword(ResetPasswordVM model)
 		{
 			var user = await _userManager.FindByIdAsync(model.UserId);
@@ -109,7 +106,6 @@ namespace ImageApp.BLL.Implementation
 			return (false, "User does not exist!");
 		}
 
-
 		public async Task<(bool successful, string msg)> ChangeDetailToken(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
@@ -124,8 +120,6 @@ namespace ImageApp.BLL.Implementation
 			await _serviceFactory.GetService<IAuthenticationService>().SendEmailAsync(user.Email, "Change Details", page);
 			return (true, "Change Detail Email Sent");
 		}
-
-
 
 		public async Task<(bool successful, string msg)> VerifyChangeDetailToken(ConfirmTokenVM model)
 		{
@@ -143,8 +137,6 @@ namespace ImageApp.BLL.Implementation
 			return (false, "Verification failed");
 
 		}
-
-
 
 		public async Task<(bool successful, string msg)> ChangePassword(ChangePasswordVM model)
 		{

@@ -19,7 +19,8 @@ namespace ImageApp.BLL.Implementation
 		private readonly IServiceFactory _serviceFactory;
 		private readonly IWebHostEnvironment _webHostEnvironment;
 
-		public UserServices(IWebHostEnvironment webHostEnvironment, IServiceFactory serviceFactory, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork)
+		public UserServices(IWebHostEnvironment webHostEnvironment, IServiceFactory serviceFactory, 
+			UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
@@ -31,8 +32,6 @@ namespace ImageApp.BLL.Implementation
 
 			
 		}
-
-
 
 		public async Task<(bool successful, string msg)> RegisterAdmin(RegisterVM register)
 		{
@@ -260,7 +259,6 @@ namespace ImageApp.BLL.Implementation
             {
                 await model.ProfileImagePath.CopyToAsync(stream);
             }
-
 
             user.ProfileImagePath = model.ProfileImagePath.FileName;
             var result = await _userRepo.UpdateAsync(user);

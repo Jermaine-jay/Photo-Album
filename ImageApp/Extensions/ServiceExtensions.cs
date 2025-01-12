@@ -27,8 +27,6 @@ namespace ImageApp.Extensions
 			services.Configure<DataProtectionTokenProviderOptions>(x => x.TokenLifespan = TimeSpan.FromMinutes(10));
 		}
 
-
-
 		public static void ConfigureIdentity(this IServiceCollection services)
 		{
 			services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -55,7 +53,6 @@ namespace ImageApp.Extensions
 				options.LoginPath = "/User/SignIn";
 			});
 		}
-
 
 		public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
 		{

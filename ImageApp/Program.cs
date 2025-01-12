@@ -25,7 +25,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork<ImageAppDbContext>>();
 builder.Services.AddAutoMapper(Assembly.Load("ImageApp.BLL"));
 
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

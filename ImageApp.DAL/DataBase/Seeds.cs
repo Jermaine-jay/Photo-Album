@@ -1,6 +1,7 @@
 ﻿using ImageApp.DAL.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ImageApp.DAL.DataBase
@@ -16,7 +17,7 @@ namespace ImageApp.DAL.DataBase
             {
                 await context.Pictures.AddRangeAsync(AddPictures());
                 await context.Pictures.AddRangeAsync(AddPictures2());
-                await context.SaveChangesAsync();
+                //await context.SaveChangesAsync();
             }
         }
 
