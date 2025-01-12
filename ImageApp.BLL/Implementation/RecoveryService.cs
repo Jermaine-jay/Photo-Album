@@ -106,7 +106,6 @@ namespace ImageApp.BLL.Implementation
 			return (false, "User does not exist!");
 		}
 
-
 		public async Task<(bool successful, string msg)> ChangeDetailToken(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
@@ -138,8 +137,6 @@ namespace ImageApp.BLL.Implementation
 			return (false, "Verification failed");
 
 		}
-
-
 
 		public async Task<(bool successful, string msg)> ChangePassword(ChangePasswordVM model)
 		{

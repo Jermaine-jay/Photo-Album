@@ -24,7 +24,6 @@ namespace ImageApp.BLL.Implementation
 			_propertyService = propertyService;
 		}
 
-
 		public async Task<(bool successful, string msg)> AddImage(AddOrUpdatePictureVM model)
 		{
 			var fileName = model.ImageFile.FileName;
@@ -52,7 +51,6 @@ namespace ImageApp.BLL.Implementation
 			var result = await _propertyService?.AddOrUpdateAsync(img);
 			return result;
 		}
-
 
         public async Task<(bool successful, string msg)> UpdateImage(PictureVM model)
 		{

@@ -69,7 +69,6 @@ namespace ImageApp.BLL.Implementation
 			return (true, "Verification Mail sent to your Email Address");
 		}
 
-
 		public async Task<bool> Execute(string email, string subject, string htmlMessage)
 		{
 			var message = new MimeMessage();
@@ -89,12 +88,10 @@ namespace ImageApp.BLL.Implementation
 				client.Authenticate(_emailSenderOptions.Email, _emailSenderOptions.Password);
 				client.Send(message);
 				client.Disconnect(true);
-
 			}
 
 			return true;
 		}
-
 
 		public async Task<bool> VerifyEmail(string emailAddress)
 		{
@@ -121,7 +118,6 @@ namespace ImageApp.BLL.Implementation
 				return false;
 			}
 		}
-
 
 		public async Task<bool> RegistrationMail(User newUser)
 		{
