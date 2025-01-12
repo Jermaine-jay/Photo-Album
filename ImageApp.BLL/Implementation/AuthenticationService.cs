@@ -28,7 +28,8 @@ namespace ImageApp.BLL.Implementation
 		private string? _ApiKey;
 		private string? _Url;
 
-		public AuthenticationService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
+		public AuthenticationService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, 
+			IConfiguration configuration, UserManager<User> userManager, IOptions<EmailSenderOptions> optionsAccessor, IGenerateEmailVerificationPage Page)
 		{
 			_linkGenerator = linkGenerator;
 			_accessor = httpContextAccessor;
@@ -73,6 +74,7 @@ namespace ImageApp.BLL.Implementation
 		{
 			var message = new MimeMessage();
 			message.From.Add(new MailboxAddress("Image App", _emailSenderOptions.Username));
+
 			message.To.Add(new MailboxAddress(email, email));
 			message.Subject = subject;
 
@@ -105,7 +107,7 @@ namespace ImageApp.BLL.Implementation
 					response.EnsureSuccessStatusCode();
 
 					var responseContent = await response.Content.ReadAsStringAsync();
-					var getResponse = JsonConvert.DeserializeObject<dynamic>(responseContent).status;
+					dynamic? getResponse = JsonConvert.DeserializeObject<dynamic>(responseContent).status;
 					if (getResponse == "valid")
 					{
 						return true;

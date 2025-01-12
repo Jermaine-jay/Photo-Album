@@ -66,7 +66,6 @@ namespace ImageApp.BLL.Implementation
 			return result;
         }
 
-
         public async Task<IEnumerable<UserWithPicturesVM>> GetImages()
 		{
 			var user = await _userRepo.GetAllAsync(include: u => u.Include(x => x.Pictures));
